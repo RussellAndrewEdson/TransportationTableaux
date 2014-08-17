@@ -27,7 +27,53 @@
   *
   * Class usage example:
   * {{{
+  *   // Set up a Transportation Problem to be solved:
+  *   val sup = Array[Int](9, 5, 2)
+  *   val dem = Array[Int](8, 4, 4)
+  *   val linkFlow = Array(Array(3,2,3), Array(3,5,1), Array(4,6,3))
+  *   val tab = new TransportationTableau(sup, dem, linkFlow)
   *
+  *   // We always perform the North-West corner rule to begin with.
+  *   tab.northWestCornerRule()
+  *
+  *   // We can check the initial allocations and the associated cost:
+  *   tab.allocations               // ((8,1,0), (0,3,2), (0,0,2))
+  *   tab.cost()                    // 49
+  *
+  *   // We can get the basic solution at any time.
+  *   tab.basicSolution             // ((0,0), (0,1), (1,1), (1,2), (2,2))
+  *
+  *   // To improve the tableau, we first find the "star pair":
+  *   val star = tab.starPair()     // (1,0)
+  *
+  *   // The star pair is then used to form a cycle in the tableau:
+  *   val cycle = tab.cycleTraversal(star)    
+  *                                 // ((1,0), (1,1), (0,1), (0,0))
+  *
+  *   // The cycle is then used to adjust the allocations:
+  *   tab.adjustAllocations(cycle)
+  *   tab.allocations               // ((5,4,0), (3,0,2), (0,0,2))
+  *
+  *   // The cost will be smaller (or equal) for this new allocation.
+  *   tab.cost()                    // 40
+  *
+  *   // We can also view the ui and vj dual variables at any time:
+  *   tab.ui                        // (0,0,2)
+  *   tab.vj                        // (3,2,1)
+  *
+  *   // Finally, we can check if we've reached the optimal allocation.
+  *   tab.isOptimal()               // false
+  *
+  *   // We can loop until the tableau has been solved:
+  *   while (!tab.isOptimal()) {
+  *     tab.adjustAllocations( tab.cycleTraversal(tab.starPair) )
+  *     // We can print intermediate tableau/star pairs/cycles as needed.
+  *   }
+  *
+  *   // When the loop finishes, we will have the optimal allocation of
+  *   // supply to demand, and the minimum possible cost of transportation.
+  *   tab.allocations               // ((5,4,0), (1,0,4), (2,0,0)) 
+  *   tab.cost()                    // 38
   *
   * }}}
   *
@@ -39,7 +85,7 @@
   *
   * @author Russell Edson, <russell.andrew.edson@gmail.com>
   * @version 0.1
-  * @date 16/08/2014
+  * @date 17/08/2014
   */
 class TransportationTableau(
     val supplies: Array[Int],
