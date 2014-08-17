@@ -74,7 +74,6 @@
   *   // supply to demand, and the minimum possible cost of transportation.
   *   tab.allocations               // ((5,4,0), (1,0,4), (2,0,0)) 
   *   tab.cost()                    // 38
-  *
   * }}}
   *
   * @constructor Create a new Transportation Tableau with the given supplies,
