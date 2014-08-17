@@ -174,9 +174,12 @@ class TransportationTableau(
     minusPairs.foreach { p => allocations(p._1)(p._2) -= minimumAllocation }
 
     /* The basic pairs are updated by removing the minimum pair,
-     * which now has no allocation.
+     * which now has no allocation, and adding the head of the cycle
+     * (the star pair), which we consider to have had an allocation (even
+     * though the allocation may have been +0.)
      */
     basicPairs = basicPairs diff(List(minimumPair))
+    basicPairs = cycle.head :: basicPairs
 
     /* Finally, we solve for the ui, vj dual variables. */
     solveUiVj()
@@ -209,7 +212,30 @@ class TransportationTableau(
     * @return The cycle if it exists, and an empty List otherwise.
     */
   def cycleTraversal(starPair: Tuple2[Int, Int]): List[Tuple2[Int, Int]] = {
-    
+    /* We first isolate the cycle in the star pair and basic pairs, and then 
+     * "prune" it to the smallest possible cycle with no redundant pairs 
+     * included. We do this by taking advantage of the fact that our 
+     * isolateCycle() method is defined to return an empty list if no 
+     * cycle exists.
+     */
+    var cycle = isolateCycle(starPair :: basicPairs)
+    if (cycle.nonEmpty) {
+      /* We make a copy of the cycle here so we can safely remove pairs from
+       * it during the loop.
+       */
+      var minimalCycle = cycle
+      for (pair <- cycle) {
+        val cycleWithoutPair = isolateCycle( (cycle diff List(pair)) )
+        if (cycleWithoutPair.nonEmpty)
+          /* In this case we can remove the pair from the cycle
+           * without affecting the cycle structure.
+           */
+          minimalCycle = minimalCycle diff List(pair)
+      }
+      cycle = minimalCycle
+    }
+
+    cycle
   }
 
   /** Returns true if the optimal tableau has been reached for the problem.
@@ -225,6 +251,32 @@ class TransportationTableau(
       false
     else
       indices.forall { p => ui(p._1) + vj(p._2) <= linkFlowCosts(p._1)(p._2) }
+
+  /** Returns the cycle in a given set of pairs, provided exactly one cycle
+    * exists. If no cycle exists, this method returns an empty list.
+    *
+    * (If multiple cycles exist [which shouldn't happen in the program], this
+    * method will have only removed those pairs that don't exist on any of the
+    * cycles.)
+    *
+    * @param pairs The pairs to isolate the cycle from.
+    * @return The cycle if it exists, and an empty list otherwise.
+    */
+  private def isolateCycle(
+      pairs: List[Tuple2[Int, Int]]): List[Tuple2[Int, Int]] = {
+    
+    /* We repeatedly remove any pairs with less than 2 adjacent pairs 
+     * (this means that those pairs are "leaves", and can be safely removed
+     * without losing the cycle.)
+     */
+    val leaves = cycle.filter { p => adjacentPairs(p, cycle).length < 2 }
+
+    /* If we didn't end up filtering out any non-cycle pairs, we're done.
+     * Otherwise, we recursively filter the new set of pairs.
+     */
+    // TODO: Check whether this is actually tail-recursive...
+    if (leaves.empty) pairs else isolateCycle( (pairs diff(leaves)) )
+  }
 
   /** Applies the North-West corner rule to the tableau to find an initial
     * basic solution to the transportation problem.
