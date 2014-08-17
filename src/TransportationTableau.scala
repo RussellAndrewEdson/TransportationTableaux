@@ -41,7 +41,7 @@
   *   tab.cost()                    // 49
   *
   *   // We can get the basic solution at any time.
-  *   tab.basicSolution             // ((0,0), (0,1), (1,1), (1,2), (2,2))
+  *   tab.basicSolution             // ((2,2), (1,2), (1,1), (0,1), (0,0))
   *
   *   // To improve the tableau, we first find the "star pair":
   *   val star = tab.starPair()     // (1,0)
@@ -232,7 +232,35 @@ class TransportationTableau(
            */
           minimalCycle = minimalCycle diff List(pair)
       }
-      cycle = minimalCycle
+
+      /* Finally, we sort the cycle in traversal order, starting from the
+       * star pair.
+       */
+      var traversalOrder = starPair :: Nil
+      minimalCycle = minimalCycle diff List(starPair)
+
+      while (minimalCycle.nonEmpty) {
+        /* We consider the current head of the traversal. */
+        val currentPair = traversalOrder.head
+        val adjacent = adjacentPairs(currentPair, minimalCycle)
+
+        /* Here we arbitrarily pick the direction to traverse along the
+         * cycle in. We always go with whatever the first pair in the
+         * adjacent list is, so notice that we favour going left/up before
+         * right/down. 
+         * 
+         * Also note that we only have to make this choice for the first pair;
+         * after that, there should only ever be one pair in the adjacent
+         * list to pick from.
+         */
+        traversalOrder = (adjacent.head) :: traversalOrder
+        minimalCycle = minimalCycle diff List(adjacent.head) 
+      }
+
+      /* Since we prepended the next nodes (to be efficient), we reverse the
+       * traversal list to get the proper order.
+       */
+      cycle = traversalOrder.reverse
     }
 
     cycle
@@ -305,7 +333,8 @@ class TransportationTableau(
         allocations(i)(j) = canSupply
         canDemand -= canSupply
         i += 1
-        canSupply = supplies(i)
+        if (i < supplies.length)
+          canSupply = supplies(i)
       }
       else {
         /* We can fully meet demand here, so we allocate enough supply to
@@ -314,7 +343,8 @@ class TransportationTableau(
         allocations(i)(j) = canDemand
         canSupply -= canDemand
         j += 1
-        canDemand = demands(j)
+        if (j < demands.length)
+          canDemand = demands(j)
       }
     }
 
@@ -364,29 +394,31 @@ class TransportationTableau(
      */
     while ( filledUiIndices.nonEmpty || filledVjIndices.nonEmpty ) {
       if (filledUiIndices.nonEmpty) {
+        val nextUiIndex = filledUiIndices.dequeue
         for (p <- basicPairs)
-          if ( (p._1 == filledUiIndices.dequeue) && !vjChanged(p._2) )
+          if ( (p._1 == nextUiIndex) && !vjChanged(p._2) )
             setVj(p._2, (linkFlowCosts(p._1)(p._2) - ui(p._1)))
       }
       else {
+        val nextVjIndex = filledVjIndices.dequeue
         for (p <- basicPairs)
-          if ( (p._2 == filledVjIndices.dequeue) && !uiChanged(p._1) )
+          if ( (p._2 == nextVjIndex) && !uiChanged(p._1) )
             setUi(p._1, (linkFlowCosts(p._1)(p._2) - vj(p._2)))
       }
     }
   }
 
   /** Returns the "star pair" that needs to have it's allocation increased
-    * for the next tableau. 
+    * for the next tableau.
     *
     * The star pair is found by searching for any pairs that need to have
     * their allocation modified to ensure dual-feasibility of their ui and
     * vj values (ie. any pairs that have the sum of their corresponding ui
     * and vj values exceed the value of the link-flow cost.)
     *
-    * @return The star pair for the tableau, or None if it doesn't exist.
+    * @return The star pair for the tableau.
     */
-  def starPair(): Option[Tuple2[Int, Int]] = 
-    indices.find { p => ui(p._1) + vj(p._2) > linkFlowCosts(p._1)(p._2) }
+  def starPair(): Tuple2[Int, Int] = 
+    indices.find { p => ui(p._1) + vj(p._2) > linkFlowCosts(p._1)(p._2) }.get
 
 }
