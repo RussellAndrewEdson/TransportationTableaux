@@ -110,7 +110,7 @@ class TransportationTableau(
     * the non-trivial allocations in the tableau (though sometimes we 
     * will have indices with zero allocations here -- this is because
     * the algorithm keeps the number of basic variables constant once the
-    * initial allocation has been made with the North-West Corner Rule.
+    * initial allocation has been made with the North-West Corner Rule.)
     */
   private var basicPairs = List[Tuple2[Int, Int]]()
 
