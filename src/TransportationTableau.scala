@@ -120,6 +120,36 @@ class TransportationTableau(
     */
   val indices = for (i <- supplies.indices; j <- demands.indices) yield (i,j)
 
+  /** Returns the list of index pairs that are considered adjcent to the
+    * given pair in the tableau (ie. they are the closest pairs in each
+    * direction left, right, up or down.
+    *
+    * @param pair The pair to find the adjacent pairs for.
+    * @param candidates The pairs from which to check for adjacency.
+    * @return The list of pairs that are adjacent to the given pair.
+    */
+  private def adjacentPairs(
+      pair: Tuple2[Int, Int],
+      candidates: List[Tuple2[Int, Int]] ): List[Tuple2[Int, Int]] ) = {
+    
+    /* First, we isolate all of the pairs to the left, right, up and down
+     * from the given pair respectively.
+     */
+    val left  = candidates.filter { p => p._2 == pair._2 && p._1 < pair._1 }
+    val right = candidates.filter { p => p._2 == pair._2 && p._1 > pair._1 }
+    val up    = candidates.filter { p => p._1 == pair._1 && p._2 > pair._2 }
+    val down  = candidates.filter { p => p._1 == pair._1 && p._2 < pair._2 }
+
+    /* Now we pick the closest pair from those lists. */
+    var adjacent = List[Tuple2[Int, Int]]()
+    if (left.nonEmpty)  adjacent = left.maxBy { _._1 } :: adjacent
+    if (right.nonEmpty) adjacent = right.minBy { _._1 } :: adjacent
+    if (up.nonEmpty)    adjacent = up.minBy { _._2 } :: adjacent
+    if (down.nonEmpty)  adjacent = down.maxBy { _._2 } :: adjacent
+
+    adjacent
+  }
+
   /** Adjusts the supply-to-demand allocations according to the given 
     * tableau cycle, and updates the set of basic pairs to reflect
     * the change.
