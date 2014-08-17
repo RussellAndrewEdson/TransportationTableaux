@@ -130,7 +130,7 @@ class TransportationTableau(
     */
   private def adjacentPairs(
       pair: Tuple2[Int, Int],
-      candidates: List[Tuple2[Int, Int]] ): List[Tuple2[Int, Int]] ) = {
+      candidates: List[Tuple2[Int, Int]] ): List[Tuple2[Int, Int]] = {
     
     /* First, we isolate all of the pairs to the left, right, up and down
      * from the given pair respectively.
@@ -269,13 +269,13 @@ class TransportationTableau(
      * (this means that those pairs are "leaves", and can be safely removed
      * without losing the cycle.)
      */
-    val leaves = cycle.filter { p => adjacentPairs(p, cycle).length < 2 }
+    val leaves = pairs.filter { p => adjacentPairs(p, pairs).length < 2 }
 
     /* If we didn't end up filtering out any non-cycle pairs, we're done.
      * Otherwise, we recursively filter the new set of pairs.
      */
     // TODO: Check whether this is actually tail-recursive...
-    if (leaves.empty) pairs else isolateCycle( (pairs diff(leaves)) )
+    if (leaves.isEmpty) pairs else isolateCycle( (pairs diff(leaves)) )
   }
 
   /** Applies the North-West corner rule to the tableau to find an initial
@@ -297,7 +297,7 @@ class TransportationTableau(
      * grid; similarly, we move to the next column if the demand has been met.
      */
     while (i < allocations.length && j < allocations(i).length) {
-      basicPairs += ((i,j))
+      basicPairs = (i,j) :: basicPairs
       if (canSupply < canDemand) {
         /* We don't have enough supply to meet demand, so we allocate what
          * we can and move to the next supplier.
@@ -369,6 +369,7 @@ class TransportationTableau(
             setVj(p._2, (linkFlowCosts(p._1)(p._2) - ui(p._1)))
       }
       else {
+        for (p <- basicPairs)
           if ( (p._2 == filledVjIndices.dequeue) && !uiChanged(p._1) )
             setUi(p._1, (linkFlowCosts(p._1)(p._2) - vj(p._2)))
       }
@@ -385,7 +386,7 @@ class TransportationTableau(
     *
     * @return The star pair for the tableau, or None if it doesn't exist.
     */
-  def starPair(): Tuple2[Int, Int] = 
+  def starPair(): Option[Tuple2[Int, Int]] = 
     indices.find { p => ui(p._1) + vj(p._2) > linkFlowCosts(p._1)(p._2) }
 
 }
