@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
  
-/** A Tranportation Tableau used to solve a Balanced Transportation Problem
+/** A Transportation Tableau used to solve a Balanced Transportation Problem
   * from Operations Research in a step-by-step manner for demonstration
   * purposes.
   *
