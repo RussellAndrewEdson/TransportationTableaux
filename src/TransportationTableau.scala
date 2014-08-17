@@ -85,7 +85,6 @@
   *
   * @author Russell Edson, <russell.andrew.edson@gmail.com>
   * @version 0.1
-  * @date 17/08/2014
   */
 class TransportationTableau(
     val supplies: Array[Int],
