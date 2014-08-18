@@ -120,7 +120,7 @@ class TransportationTableau(
 
   /** Returns the list of index pairs that are considered adjcent to the
     * given pair in the tableau (ie. they are the closest pairs in each
-    * direction left, right, up or down.
+    * direction left, right, up or down.)
     *
     * @param pair The pair to find the adjacent pairs for.
     * @param candidates The pairs from which to check for adjacency.
