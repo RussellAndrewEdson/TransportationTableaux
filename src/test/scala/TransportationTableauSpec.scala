@@ -291,5 +291,8 @@ class TransportationTableauSpec extends FlatSpec {
 
   // END EXAMPLE.
 
+
+  // Code to test another example
+
 }
 
