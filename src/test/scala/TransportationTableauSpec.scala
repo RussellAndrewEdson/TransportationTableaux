@@ -293,6 +293,6 @@ class TransportationTableauSpec extends FlatSpec {
 
 
   // Code to test another example
-
+  def example2 =  
 }
 
