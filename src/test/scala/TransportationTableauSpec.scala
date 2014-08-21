@@ -1,4 +1,7 @@
 // Spec for the TransportationTableau class.
+// These will mainly consist of examples to exercise the class (the
+// examples have been solved beforehand, and each part of the solution
+// can be checked).
 
 import org.scalatest.FlatSpec
 
