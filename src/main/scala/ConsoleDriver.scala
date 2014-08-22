@@ -39,13 +39,13 @@ object ConsoleDriver extends App {
       println("\t" + ("-" * gridWidth))
       print("\t|")
       for (j <- (0 until linkFlowCosts(i).length)) {
-        print(("%1$-" + (gridWidth-2).toString + "s|")
+        print(("%1$" + (squareWidth-1).toString + "s|")
             .format(linkFlowCosts(i)(j).toString))
       }
       println()
       print("\t|")
       for (j <- (0 until allocations(i).length)) {
-        print(("%1$" + (gridWidth-2).toString + "s|")
+        print(("%1$-" + (squareWidth-1).toString + "s|")
             .format(allocations(i)(j).toString))
       }
       println()
