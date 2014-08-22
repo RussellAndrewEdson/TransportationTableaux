@@ -431,5 +431,98 @@ class TransportationTableauSpec extends FlatSpec {
   }
   
   // END EXAMPLE
+
+
+  // Code to test another example
+  def example3 = 
+    new {
+      val supplies = Array[Int](1,1)
+      val demands = Array[Int](2)
+      val costs = Array(Array(0), Array(1))
+
+      /* The initial tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+
+      /* The tableau after the North-West corner rule. */
+      val step1 = new TransportationTableau(supplies, demands, costs)
+      step1.northWestCornerRule()
+    }
+
+  "The Example 3 tableau" should
+      "be initialised with supplies (1, 1)" in {
+    assert(example3.initial.supplies.deep == Array(1, 1).deep)
+  }
+
+  it should "be initialised with demands (2)" in {
+    assert(example3.initial.demands.deep == Array(2).deep)
+  }
+
+  it should "have link-flow costs ((0), (1))" in {
+    assert(example3.initial.linkFlowCosts.deep == 
+        Array(Array(0), Array(1)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example3.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "not be optimal before we've started" in {
+    assert(example3.initial.isOptimal == false)
+  }
+
+  it should "not provide a basic solution before we've started" in {
+    assert(example3.initial.basicSolution == List())
+  }
+
+  it should "start with a cost of 0 (no allocations made yet)" in {
+    assert(example3.initial.cost == 0)
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example3.initial.ui.deep == Array(0,0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example3.initial.vj.deep == Array(0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example3.initial.indices == 
+        (for (i <- 0 until 2; j <- 0 until 1) yield (i,j)) )
+  }
+
+  it should "complete the North-West corner rule without error" in {
+    example3.initial.northWestCornerRule()
+  }
+
+  "After the North-West corner rule, the Example 3 tableau" should
+      "then have the allocations ((1),(1))" in {
+    assert(example3.step1.allocations.deep ==
+        Array(Array(1), Array(1)).deep)
+  }
+
+  it should "have the basic solution (0,0), (1,0)" in {
+    assert(example3.step1.basicSolution.toSet ==
+        Set((0,0), (1,0)) )
+  }
+
+  it should "have a cost of 1" in {
+    assert(example3.step1.cost == 1)
+  }
+
+  it should "have ui = (0, 1)" in {
+    assert(example3.step1.ui.deep == Array(0, 1).deep)
+  }
+
+  it should "have vj = (0)" in {
+    assert(example3.step1.vj.deep == Array(0).deep)
+  }
+
+  it should "be optimal" in {
+    assert(example3.step1.isOptimal == true)
+  }
+
+  // END EXAMPLE
+
 }
 
