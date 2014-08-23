@@ -26,7 +26,10 @@
 import java.util.Scanner
 
 object ConsoleDriver extends App {
-  /** We define the width of each square of the printed grid. */
+  /** We define the width of each square of the printed grid.
+    * This number is arbitrary -- larger widths can increase readability
+    * if the allocations/costs are particularly large numbers.
+    */
   val squareWidth = 10
 
   /** Prints the current transportation tableau to the screen in a nicely
@@ -73,11 +76,10 @@ object ConsoleDriver extends App {
       }
       println()
     }
-
     println("\t" + ("-" * gridWidth))
 
     /* We print the current basic solution at the bottom of the tableau. */
-    //TODO: print the basic solution.
+    println("Basic Solution: " + tableau.basicSolution.mkString(", "))
 
     /* We print the current cost at the bottom of the tableau. */
     println("Cost = " + tableau.cost().toString)
@@ -96,7 +98,6 @@ object ConsoleDriver extends App {
   for (i <- (0 until supplies.length)) {
     supplies(i) = input.nextInt
   }
-  //val supplies = readLine().filter(_ != '\n').split(' ').map(_.toInt).toList
   println()
 
   /* Prompt for the number of demands. */
@@ -110,7 +111,6 @@ object ConsoleDriver extends App {
   for (j <- (0 until demands.length)) {
     demands(j) = input.nextInt
   }
-  //val demands = readLine().filter(_ != '\n').split(' ').map(_.toInt).toList
   println()
 
   /* Prompt for the link flow cost matrix. */
@@ -142,9 +142,12 @@ object ConsoleDriver extends App {
    * reached.
    */
   while (!tableau.isOptimal()) {
-    // TODO: print out the star pair and cycle traversals.
     val starPair = tableau.starPair
+    println("Star pair: " + starPair.toString)
+
     val cycle = tableau.cycleTraversal(starPair)
+    println("Cycle: " + cycle.mkString("->"))
+    println()
 
     tableau.adjustAllocations(cycle)
 
