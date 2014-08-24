@@ -82,8 +82,8 @@
   * @param demands The demands for the Transportation Problem.
   * @param linkFlowCosts The matrix of link-flow costs for supply to demand.
   *
-  * @author Russell Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 1.0
   */
 class TransportationTableau(
     val supplies: Array[Int],
