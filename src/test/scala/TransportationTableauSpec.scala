@@ -547,5 +547,191 @@ class TransportationTableauSpec extends FlatSpec {
 
   // END EXAMPLE
 
+  // Example 4
+  // END EXAMPLE
+
+  // Example 5
+  def example5 =
+    new {
+      val supplies = Array[Int](9, 5, 2)
+      val demands = Array[Int](8, 4, 4)
+      val costs = Array(Array(3, 2, 3), Array(3, 5, 1), Array(4, 6, 3))
+
+      /* The initial tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+
+      /* The tableau after the North-West corner rule. */
+      val step1 = new TransportationTableau(supplies, demands, costs)
+      step1.northWestCornerRule()
+
+      /* The tableau after the 1st adjustment. */
+      val step2 = new TransportationTableau(supplies, demands, costs)
+      step2.northWestCornerRule()
+      step2.adjustAllocations(step2.cycleTraversal(step2.starPair))
+
+      /* The tableau after the 2nd adjustment. */
+      val step3 = new TransportationTableau(supplies, demands, costs)
+      step3.northWestCornerRule()
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+  }
+
+  "The Example 5 tableau" should
+      "be initialised with supplies (9, 5, 2)" in {
+    assert(example5.initial.supplies.deep == Array(9, 5, 2).deep)
+  }
+
+  it should "be initialised with demands (8, 4, 4)" in {
+    assert(example5.initial.demands.deep == Array(8, 4, 4).deep)
+  }
+
+  it should "have link-flow costs ((3,2,3), (3,5,1), (4,6,3))" in {
+    assert(example5.initial.linkFlowCosts.deep ==
+        Array(Array(3,2,3), Array(3,5,1), Array(4,6,3)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example5.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "not be optimal before we've started" in {
+    assert(example5.initial.isOptimal == false)
+  }
+
+  it should "not provide a basic solution before we've started" in {
+    assert(example5.initial.basicSolution == List())
+  }
+
+  it should "start with a cost of 0 (no allocations made yet)" in {
+    assert(example5.initial.cost == 0)
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example5.initial.ui.deep == Array(0,0,0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example5.initial.vj.deep == Array(0,0,0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example5.initial.indices == 
+        (for (i <- 0 until 3; j <- 0 until 3) yield (i,j)) ) 
+  }
+
+  it should "complete the North-West corner rule without error" in {
+    example5.initial.northWestCornerRule()
+  }
+
+  "After the North-West corner rule, the Example 5 tableau" should
+      "then have the allocations ((8,1,0), (0,3,2), (0,0,2))" in {
+    assert(example5.step1.allocations.deep ==
+        Array(Array(8,1,0), Array(0,3,2), Array(0,0,2)).deep)
+  }
+
+  it should "have the basic solution (0,0), (0,1), (1,1), (1,2), (2,2)" in {
+    assert(example5.step1.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,1), (1,2), (2,2)) )
+  }
+
+  it should "have a cost of 49" in {
+    assert(example5.step1.cost == 49)
+  }
+
+  it should "have ui = (0, 3, 5)" in {
+    assert(example5.step1.ui.deep == Array(0, 3, 5).deep)
+  }
+
+  it should "have vj = (3, 2, -2)" in {
+    assert(example5.step1.vj.deep == Array(3, 2, -2).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example5.step1.isOptimal == false)
+  }
+
+  it should "have its star pair as (1,0)" in {
+    assert(example5.step1.starPair == (1,0))
+  }
+
+  it should "have the cycle (1,0)->(1,1)->(0,1)->(0,0)" in {
+    assert(example5.step1.cycleTraversal(example5.step1.starPair) ==
+        List((1,0), (1,1), (0,1), (0,0)) )
+  }
+
+  it should "adjust allocations along the cycle without error" in {
+    example5.step1.adjustAllocations(
+        example5.step1.cycleTraversal(example5.step1.starPair))
+  }
+
+  "After the 1st adjustment, the Example 5 tableau" should
+      "then have the allocations ((5,4,0), (3,0,2), (0,0,2))" in {
+    assert(example5.step2.allocations.deep ==
+        Array(Array(5,4,0), Array(3,0,2), Array(0,0,2)).deep)
+  }
+
+  it should "have the basic solution (0,0), (0,1), (1,0), (1,2), (2,2)" in {
+    assert(example5.step2.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,0), (1,2), (2,2)) )
+  }
+
+  it should "have a cost of 40" in {
+    assert(example5.step2.cost == 40)
+  }
+
+  it should "have ui = (0, 0, 2)" in {
+    assert(example5.step2.ui.deep == Array(0, 0, 2).deep)
+  }
+
+  it should "have vj = (3, 2, 1)" in {
+    assert(example5.step2.vj.deep == Array(3, 2, 1).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example5.step2.isOptimal == false)
+  }
+
+  it should "have its star pair as (2,0)" in {
+    assert(example5.step2.starPair == (2,0))
+  }
+
+  it should "have the cycle (2,0)->(2,2)->(1,2)->(1,0)" in {
+    assert(example5.step2.cycleTraversal(example5.step2.starPair) ==
+        List((2,0), (2,2), (1,2), (1,0)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example5.step2.adjustAllocations(
+        example5.step2.cycleTraversal(example5.step2.starPair))
+  }
+
+  "After the 2nd adjustment, the Example 5 tableau" should
+      "then have the allocations ((5,4,0), (1,0,4), (2,0,0))" in {
+    assert(example5.step3.allocations.deep ==
+        Array(Array(5,4,0), Array(1,0,4), Array(2,0,0)).deep)
+  }
+
+  it should "have the basic solution (0,0), (0,1), (1,0), (1,2), (2,0)" in {
+    assert(example5.step3.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,0), (1,2), (2,0)) )
+  }
+
+  it should "have a cost of 38" in {
+    assert(example5.step3.cost == 38)
+  }
+
+  it should "have ui = (0, 0, 1)" in {
+    assert(example5.step3.ui.deep == Array(0, 0, 1).deep)
+  }
+
+  it should "have vj = (3, 2, 1)" in {
+    assert(example5.step3.vj.deep == Array(3, 2, 1).deep)
+  }
+
+  it should "be optimal" in {
+    assert(example5.step3.isOptimal == true)
+  }
+
+  // END EXAMPLE
 }
 
