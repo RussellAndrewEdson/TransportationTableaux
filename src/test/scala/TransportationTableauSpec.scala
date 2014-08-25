@@ -548,6 +548,91 @@ class TransportationTableauSpec extends FlatSpec {
   // END EXAMPLE
 
   // Example 4
+  def example4 =
+    new {
+      val supplies = Array[Int](1)
+      val demands = Array[Int](1)
+      val costs = Array(Array(1))
+
+      /* The initial tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+
+      /* The tableau after the North-West corner rule. */
+      val step1 = new TransportationTableau(supplies, demands, costs)
+      step1.northWestCornerRule()
+    }
+
+  "The Example 4 Tableau" should "be initialised with supplies (1)" in {
+    assert(example4.initial.supplies.deep == Array(1).deep)
+  }
+
+  it should "be initialised with demands (1)" in {
+    assert(example4.initial.demands.deep == Array(1).deep)
+  }
+
+  it should "have link-flow costs ((1))" in {
+    assert(example4.initial.linkFlowCosts.deep == Array(Array(1)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example4.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "not be optimal before we've started" in {
+    assert(example4.initial.isOptimal == false)
+  }
+
+  it should "not provide a basic solution before we've started" in {
+    assert(example4.initial.basicSolution == List())
+  }
+
+  it should "start with a cost of 0 (no allocations made yet)" in {
+    assert(example4.initial.cost == 0)
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example4.initial.ui.deep == Array(0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example4.initial.vj.deep == Array(0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example4.initial.indices ==
+        (for (i <- 0 until 1; j <- 0 until 1) yield (i,j)) )
+  }
+
+  it should "complete the North-West corner rule without error" in {
+    example4.initial.northWestCornerRule()
+  }
+
+  "After the North-West corner rule, the Example 4 tableau" should
+      "then have the allocations ((1))" in {
+    assert(example4.step1.allocations.deep == Array(Array(1)).deep)
+  }
+
+  it should "have the basic solution (0,0)" in {
+    assert(example4.step1.basicSolution.toSet == Set((0,0)) )
+  }
+
+  it should "have a cost of 1" in {
+    assert(example4.step1.cost == 1)
+  }
+
+  it should "have ui = (0)" in {
+    assert(example4.step1.ui.deep == Array(0).deep)
+  }
+
+  it should "have vj = (1)" in {
+    assert(example4.step1.vj.deep == Array(1).deep)
+  }
+
+  it should "be optimal" in {
+    assert(example4.step1.isOptimal == true)
+  }
+
+
   // END EXAMPLE
 
   // Example 5
@@ -574,7 +659,7 @@ class TransportationTableauSpec extends FlatSpec {
       step3.northWestCornerRule()
       step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
       step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
-  }
+    }
 
   "The Example 5 tableau" should
       "be initialised with supplies (9, 5, 2)" in {
