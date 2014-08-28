@@ -818,5 +818,88 @@ class TransportationTableauSpec extends FlatSpec {
   }
 
   // END EXAMPLE
+
+  // Example 6
+  def example6 = 
+    new {
+      val supplies = Array[Int](250, 130, 235)
+      val demands = Array[Int](75, 240, 230, 70)
+      val costs = Array(
+          Array(15, 20, 16, 21), Array(25, 13, 5, 11), Array(15, 15, 7, 17) )
+
+      /* The initial tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+
+      /* The tableau after the North-West corner rule. */
+      val step1 = new TransportationTableau(supplies, demands, costs)
+      step1.northWestCornerRule()
+
+      /* The tableau after the 1st adjustment. */
+      val step2 = new TransportationTableau(supplies, demands, costs)
+      step2.northWestCornerRule()
+      step2.adjustAllocations(step2.cycleTraversal(step2.starPair))
+
+      /* The tableau after the 2nd adjustment. */
+      val step3 = new TransportationTableau(supplies, demands, costs)
+      step3.northWestCornerRule()
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+
+      /* The tableay after the 3rd adjustment. */
+      val step4 = new TransportationTableau(supplies, demands, costs)
+      step4.northWestCornerRule()
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+    }
+
+  "The Example 6 tableau" should
+      "be initialised with supplies (250, 130, 235)" in {
+    assert(example6.initial.supplies.deep == Array(250, 130, 235).deep)
+  }
+
+  it should "be initialised with demands (75, 240, 230, 70)" in {
+    assert(example6.initial.demands.deep == Array(75, 240, 230, 70).deep)
+  }
+
+  it should 
+      "have link-flow costs ((15,20,16,21), (25,13,5,11), (15,15,7,17))" in {
+    assert(example6.initial.linkFlowCosts.deep == 
+        Array(Array(15,20,16,21), Array(25,13,5,11), Array(15,15,7,17)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example6.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "not be optimal before we've started" in {
+    assert(example6.initial.isOptimal == false)
+  }
+
+  it should "not provide a basic solution before we've started" in {
+    assert(example6.initial.basicSolution == List())
+  }
+
+  it should "start with a cost of 0 (no allocations made yet)" in {
+    assert(example6.initial.cost == 0)
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example6.initial.ui.deep == Array(0,0,0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example6.initial.vj.deep == Array(0,0,0,0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example6.initial.indices ==
+        (for (i <- 0 until 3; j <- 0 until 4) yield (i,j)) )
+  }
+
+  it should "complete the North-West corner rule without error" in {
+    example6.initial.northWestCornerRule()
+  }
+
 }
 
