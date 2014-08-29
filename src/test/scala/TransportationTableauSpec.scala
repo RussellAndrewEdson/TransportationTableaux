@@ -901,5 +901,46 @@ class TransportationTableauSpec extends FlatSpec {
     example6.initial.northWestCornerRule()
   }
 
+  "After the North-West corner rule, the Example 6 tableau" should
+      "then have the allocations ((75,175,0,0),(0,65,65,0),(0,0,165,70))" in {
+    assert(example6.step1.allocations.deep ==
+        Array(Array(75,175,0,0), Array(0,65,65,0), Array(0,0,165,70)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(1,1),(1,2),(2,2),(2,3)" in {
+    assert(example6.step1.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,1), (1,2), (2,2), (2,3)) )
+  }
+
+  it should "have a cost of 8140" in {
+    assert(example6.step1.cost == 8140)
+  }
+
+  it should "have ui = (0, -7, -5)" in {
+    assert(example6.step1.ui.deep == Array(0, -7, -5).deep)
+  }
+
+  it should "have vj = (15, 20, 12, 22)" in {
+    assert(example6.step1.vj.deep == Array(15, 20, 12, 22).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example6.step1.isOptimal == false)
+  }
+
+  it should "have its star pair as (0,3)" in {
+    assert(example6.step1.starPair == (0,3))
+  }
+
+  it should "have the cycle (0,3)->(0,1)->(1,1)->(1,2)->(2,2)->(2,3)" in {
+    assert(example6.step1.cycleTraversal(example6.step1.starPair) ==
+        List((0,3), (0,1), (1,1), (1,2), (2,2), (2,3)) )
+  }
+
+  it should "adjust allocations along the cycle without error" in {
+    example6.step1.adjustAllocations(
+        example6.step1.cycleTraversal(example6.step1.starPair))
+  }
+
 }
 
