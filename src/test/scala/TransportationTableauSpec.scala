@@ -942,5 +942,114 @@ class TransportationTableauSpec extends FlatSpec {
         example6.step1.cycleTraversal(example6.step1.starPair))
   }
 
+  "After the 1st adjustment, the Example 6 tableau" should
+      "then have the allocations ((75,110,0,65),(0,130,0,0),(0,0,230,5))" in {
+    assert(example6.step2.allocations.deep ==
+        Array(Array(75,110,0,65), Array(0,130,0,0), Array(0,0,230,5)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(0,3),(1,1),(2,2),(2,3)" in {
+    assert(example6.step2.basicSolution.toSet ==
+        Set((0,0), (0,1), (0,3), (1,1), (2,2), (2,3)) )
+  }
+
+  it should "have a cost of 8075" in {
+    assert(example6.step2.cost == 8075)
+  }
+
+  it should "have ui = (0, -7, -4)" in {
+    assert(example6.step2.ui.deep == Array(0, -7, -4).deep)
+  }
+
+  it should "have vj = (15, 20, 11, 21)" in {
+    assert(example6.step2.vj.deep == Array(15, 20, 11, 21).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example6.step2.isOptimal == false)
+  }
+
+  it should "have its star pair as (1,3)" in {
+    assert(example6.step2.starPair == (1,3))
+  }
+
+  it should "have the cycle (1,3)->(1,1)->(0,1)->(0,3)" in {
+    assert(example6.step2.cycleTraversal(example6.step2.starPair) ==
+        List((1,3), (1,1), (0,1), (0,3)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example6.step2.adjustAllocations(
+        example6.step2.cycleTraversal(example6.step2.starPair))
+  }
+
+  "After the 2nd adjustment, the Example 6 tableau" should
+      "then have the allocations ((75,175,0,0),(0,65,0,65),(0,0,230,5))" in {
+    assert(example6.step3.allocations.deep ==
+        Array(Array(75,175,0,0), Array(0,65,0,65), Array(0,0,230,5)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(1,1),(1,3),(2,2),(2,3)" in {
+    assert(example6.step3.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,1), (1,3), (2,2), (2,3)) )
+  }
+
+  it should "have a cost of 7880" in {
+    assert(example6.step3.cost == 7880)
+  }
+
+  it should "have ui = (0, -7, -1)" in {
+    assert(example6.step3.ui.deep == Array(0, -7, -1).deep)
+  }
+
+  it should "have vj = (15, 20, 8, 18)" in {
+    assert(example6.step3.vj.deep == Array(15, 20, 8, 18).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example6.step3.isOptimal == false)
+  }
+
+  it should "have its star pair as (2,1)" in {
+    assert(example6.step3.starPair == (2,1))
+  }
+
+  it should "have the cycle (2,1)->(2,3)->(1,3)->(1,1)" in {
+    assert(example6.step3.cycleTraversal(example6.step3.starPair) == 
+        List((2,1), (2,3), (1,3), (1,1)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example6.step3.adjustAllocations(
+        example6.step3.cycleTraversal(example6.step3.starPair))
+  }
+
+  "After the 3rd adjustment, the Example 6 tableau" should
+      "then have the allocations ((75,175,0,0),(0,60,0,70),(0,5,230,0))" in {
+    assert(example6.step4.allocations.deep ==
+        Array(Array(75,175,0,0), Array(0,60,0,70), Array(0,5,230,0)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(1,1),(1,3),(2,1),(2,2)" in {
+    assert(example6.step4.basicSolution.toSet ==
+        Set((0,0), (0,1), (1,1), (1,3), (2,1), (2,2)) )
+  }
+
+  it should "have a cost of 7860" in {
+    assert(example6.step4.cost == 7860)
+  }
+
+  it should "have ui = (0, -7, -5)" in {
+    assert(example6.step4.ui.deep == Array(0, -7, -5).deep)
+  }
+
+  it should "have vj = (15, 20, 12, 18)" in {
+    assert(example6.step4.vj.deep == Array(15, 20, 12, 18).deep)
+  }
+
+  it should "be optimal" in {
+    assert(example6.step4.isOptimal == true)
+  }
+
 }
 
