@@ -83,7 +83,7 @@
   * @param linkFlowCosts The matrix of link-flow costs for supply to demand.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 1.0
+  * @version 1.1
   */
 class TransportationTableau(
     val supplies: Array[Int],
@@ -130,20 +130,20 @@ class TransportationTableau(
       pair: Tuple2[Int, Int],
       candidates: List[Tuple2[Int, Int]] ): List[Tuple2[Int, Int]] = {
     
-    /* First, we isolate all of the pairs to the left, right, up and down
-     * from the given pair respectively.
+    /* First, we isolate all of the pairs that are up, down, left and 
+     * right from the given pair respectively.
      */
-    val left  = candidates.filter { p => p._2 == pair._2 && p._1 < pair._1 }
-    val right = candidates.filter { p => p._2 == pair._2 && p._1 > pair._1 }
-    val up    = candidates.filter { p => p._1 == pair._1 && p._2 > pair._2 }
-    val down  = candidates.filter { p => p._1 == pair._1 && p._2 < pair._2 }
+    val up    = candidates.filter { p => p._2 == pair._2 && p._1 < pair._1 }
+    val down  = candidates.filter { p => p._2 == pair._2 && p._1 > pair._1 }
+    val left  = candidates.filter { p => p._1 == pair._1 && p._2 > pair._2 }
+    val right = candidates.filter { p => p._1 == pair._1 && p._2 < pair._2 }
 
     /* Now we pick the closest pair from those lists. */
     var adjacent = List[Tuple2[Int, Int]]()
-    if (left.nonEmpty)  adjacent = left.maxBy { _._1 } :: adjacent
-    if (right.nonEmpty) adjacent = right.minBy { _._1 } :: adjacent
-    if (up.nonEmpty)    adjacent = up.minBy { _._2 } :: adjacent
-    if (down.nonEmpty)  adjacent = down.maxBy { _._2 } :: adjacent
+    if (up.nonEmpty)    adjacent = up.minBy    { _._1 } :: adjacent
+    if (down.nonEmpty)  adjacent = down.maxBy  { _._1 } :: adjacent
+    if (left.nonEmpty)  adjacent = left.maxBy  { _._2 } :: adjacent
+    if (right.nonEmpty) adjacent = right.minBy { _._2 } :: adjacent
 
     adjacent
   }
@@ -157,7 +157,7 @@ class TransportationTableau(
     */
   def adjustAllocations(cycle: List[Tuple2[Int, Int]]) {
     /* We label the cycle pairs +,- alternately. */
-    val plusPairs = cycle.zipWithIndex filter { _._2 % 2 == 0 } map { _._1 }
+    val plusPairs  = cycle.zipWithIndex filter { _._2 % 2 == 0 } map { _._1 }
     val minusPairs = cycle.zipWithIndex filter { _._2 % 2 != 0 } map { _._1 }
 
     /* Next, we find the minus-labelled pair with the smallest allocation. */
@@ -168,7 +168,7 @@ class TransportationTableau(
      * from the minus pairs for the allocation adjustment. This keeps the
      * total allocation in each row/column constant as required.
      */
-    plusPairs.foreach { p => allocations(p._1)(p._2) += minimumAllocation }
+    plusPairs.foreach  { p => allocations(p._1)(p._2) += minimumAllocation }
     minusPairs.foreach { p => allocations(p._1)(p._2) -= minimumAllocation }
 
     /* The basic pairs are updated by removing the minimum pair,
@@ -244,8 +244,8 @@ class TransportationTableau(
 
         /* Here we arbitrarily pick the direction to traverse along the
          * cycle in. We always go with whatever the first pair in the
-         * adjacent list is, so notice that we favour going left/up before
-         * right/down. 
+         * adjacent list is, so notice that we favour going left/right before
+         * up/down.
          * 
          * Also note that we only have to make this choice for the first pair;
          * after that, there should only ever be one pair in the adjacent
@@ -300,7 +300,6 @@ class TransportationTableau(
     /* If we didn't end up filtering out any non-cycle pairs, we're done.
      * Otherwise, we recursively filter the new set of pairs.
      */
-    // TODO: Check whether this is actually tail-recursive...
     if (leaves.isEmpty) pairs else isolateCycle( (pairs diff(leaves)) )
   }
 
