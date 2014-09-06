@@ -35,6 +35,11 @@ class EditableCell extends BorderPanel {
 
   border = LineBorder(Color.BLACK)
 
+  minimumSize = new Dimension(60,40)
+  //maximumSize = new Dimension(60,40)
+  preferredSize = new Dimension(60,40)
+
+
   layout += value -> BorderPanel.Position.Center
 
   def getValue(): Int = value.text.toInt

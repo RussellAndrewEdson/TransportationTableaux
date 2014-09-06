@@ -33,6 +33,11 @@ class ValueCell extends BorderPanel {
 
   private val value = new Label(DefaultValue.toString)
 
+  minimumSize = new Dimension(60,40)
+  //maximumSize = new Dimension(60,40)
+  preferredSize = new Dimension(60,40)
+
+
   border = LineBorder(Color.BLACK)
 
   layout += value -> BorderPanel.Position.Center

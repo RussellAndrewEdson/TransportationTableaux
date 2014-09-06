@@ -46,18 +46,20 @@ object TestGUI extends SimpleSwingApplication {
 
     val middle = new TableauView(3,3)
 
-    val controlPanel = new BoxPanel(Orientation.Horizontal) {
+    val controlPanel = new BorderPanel() {
       border = LineBorder(Color.BLACK)
 
-      contents += status
-      contents += stepButton
-      contents += solveButton
+      layout += status -> BorderPanel.Position.West
+      layout += new BoxPanel(Orientation.Horizontal) {
+        contents += stepButton
+        contents += solveButton
+      } -> BorderPanel.Position.East
     }
 
-    contents = new BoxPanel(Orientation.Vertical) {
-      contents += specPanel
-      contents += middle
-      contents += controlPanel
+    contents = new BorderPanel() {
+      layout += specPanel -> BorderPanel.Position.North
+      layout += middle -> BorderPanel.Position.Center
+      layout += controlPanel -> BorderPanel.Position.South
     }
   }
 }

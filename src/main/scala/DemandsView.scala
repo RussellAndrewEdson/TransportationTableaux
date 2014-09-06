@@ -29,7 +29,7 @@ import Swing._
 import java.awt.Color
 
 class DemandsView(length: Int) extends BoxPanel(Orientation.Horizontal) {
-  border = TitledBorder(LineBorder(Color.BLACK), "Demands")
+  border = TitledBorder(LineBorder(Color.BLACK), "Demand")
 
   private val demands = new Array[EditableCell](length)
   for (j <- 0 until demands.length) demands(j) = new EditableCell()

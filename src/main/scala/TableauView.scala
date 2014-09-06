@@ -35,10 +35,43 @@ class TableauView(supplyCount: Int, demandCount: Int) extends BorderPanel {
 
   private val linkFlow = new GridView(supplyCount, demandCount)
 
+  private val demandsV = new BorderPanel {
+    layout += new Label() {
+      minimumSize = new Dimension(60,40)
+      maximumSize = new Dimension(60,40)
+      preferredSize = new Dimension(60,40)
+    } -> BorderPanel.Position.West
+
+    layout += demands -> BorderPanel.Position.Center
+
+    layout += new Label() {
+      minimumSize = new Dimension(60,40)
+      maximumSize = new Dimension(60,40)
+      preferredSize = new Dimension(60,40)
+    } -> BorderPanel.Position.East
+  }
+
+  private val vjV = new BorderPanel {
+    layout += new Label() {
+       minimumSize = new Dimension(60,40)
+       maximumSize = new Dimension(60,40)
+       preferredSize = new Dimension(60,40)
+     } -> BorderPanel.Position.West
+     
+     layout += vj -> BorderPanel.Position.Center
+     
+     layout += new Label() {
+       minimumSize = new Dimension(60,40)
+       maximumSize = new Dimension(60,40)
+       preferredSize = new Dimension(60,40)
+     } -> BorderPanel.Position.East
+  }
+
   layout += supplies -> BorderPanel.Position.East
-  layout += demands -> BorderPanel.Position.South
+  //layout += demands -> BorderPanel.Position.South
+  layout += demandsV -> BorderPanel.Position.South
   layout += ui -> BorderPanel.Position.West
-  layout += vj -> BorderPanel.Position.North
+  layout += vjV -> BorderPanel.Position.North
   layout += linkFlow -> BorderPanel.Position.Center
 
   def getDemands(): Array[Int] = demands.getDemands()
