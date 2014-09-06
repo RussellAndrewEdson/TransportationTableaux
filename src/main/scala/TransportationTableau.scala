@@ -116,7 +116,10 @@ class TransportationTableau(
   /** The indices for the allocation and link-flow cost matrices,
     * provided to allow for easy iteration over all rows and columns.
     */
-  val indices = for (i <- supplies.indices; j <- demands.indices) yield (i,j)
+  val indices = for {
+      i <- supplies.indices 
+      j <- demands.indices
+    } yield (i,j)
 
   /** Returns the list of index pairs that are considered adjcent to the
     * given pair in the tableau (ie. they are the closest pairs in each
@@ -140,10 +143,18 @@ class TransportationTableau(
 
     /* Now we pick the closest pair from those lists. */
     var adjacent = List[Tuple2[Int, Int]]()
-    if (up.nonEmpty)    adjacent = up.minBy    { _._1 } :: adjacent
-    if (down.nonEmpty)  adjacent = down.maxBy  { _._1 } :: adjacent
-    if (left.nonEmpty)  adjacent = left.maxBy  { _._2 } :: adjacent
-    if (right.nonEmpty) adjacent = right.minBy { _._2 } :: adjacent
+    if (up.nonEmpty) {
+      adjacent = up.minBy { _._1 } :: adjacent
+    }
+    if (down.nonEmpty) { 
+      adjacent = down.maxBy { _._1 } :: adjacent
+    }
+    if (left.nonEmpty) {
+      adjacent = left.maxBy { _._2 } :: adjacent
+    }
+    if (right.nonEmpty) {
+      adjacent = right.minBy { _._2 } :: adjacent
+    }
 
     adjacent
   }
@@ -155,7 +166,7 @@ class TransportationTableau(
     * @param cycle The tableau cycle to use to adjust the allocations.
     *              This cycle can be found using the cycleTraversal() method.
     */
-  def adjustAllocations(cycle: List[Tuple2[Int, Int]]) {
+  def adjustAllocations(cycle: List[Tuple2[Int, Int]]): Unit = {
     /* We label the cycle pairs +,- alternately. */
     val plusPairs  = cycle.zipWithIndex filter { _._2 % 2 == 0 } map { _._1 }
     val minusPairs = cycle.zipWithIndex filter { _._2 % 2 != 0 } map { _._1 }
@@ -224,11 +235,12 @@ class TransportationTableau(
       var minimalCycle = cycle
       for (pair <- cycle) {
         val cycleWithoutPair = isolateCycle( (cycle diff List(pair)) )
-        if (cycleWithoutPair.nonEmpty)
+        if (cycleWithoutPair.nonEmpty) {
           /* In this case we can remove the pair from the cycle
            * without affecting the cycle structure.
            */
           minimalCycle = minimalCycle diff List(pair)
+        }
       }
 
       /* Finally, we sort the cycle in traversal order, starting from the
@@ -300,7 +312,10 @@ class TransportationTableau(
     /* If we didn't end up filtering out any non-cycle pairs, we're done.
      * Otherwise, we recursively filter the new set of pairs.
      */
-    if (leaves.isEmpty) pairs else isolateCycle( (pairs diff(leaves)) )
+    if (leaves.isEmpty) 
+      pairs 
+    else 
+      isolateCycle( (pairs diff(leaves)) )
   }
 
   /** Applies the North-West corner rule to the tableau to find an initial
@@ -311,7 +326,7 @@ class TransportationTableau(
     * When the process is finished, we will have an initial basic solution to
     * the Transportation Problem, though it may not be the optimal solution.
     */
-  def northWestCornerRule() {
+  def northWestCornerRule(): Unit = {
     /* We start in the North-West corner of the tableau. */
     var (i,j) = (0,0)
     var canSupply = supplies(i)
@@ -330,8 +345,9 @@ class TransportationTableau(
         allocations(i)(j) = canSupply
         canDemand -= canSupply
         i += 1
-        if (i < supplies.length)
+        if (i < supplies.length) {
           canSupply = supplies(i)
+        }
       }
       else {
         /* We can fully meet demand here, so we allocate enough supply to
@@ -340,8 +356,9 @@ class TransportationTableau(
         allocations(i)(j) = canDemand
         canSupply -= canDemand
         j += 1
-        if (j < demands.length)
+        if (j < demands.length) {
           canDemand = demands(j)
+        }
       }
     }
 
@@ -356,7 +373,7 @@ class TransportationTableau(
     * allocations have been changed (this saves the user the trouble of
     * having to call it manually themselves.)
     */
-  private def solveUiVj() {
+  private def solveUiVj(): Unit = {
     /* We keep track of which ui and vj values have been changed. */
     val uiChanged = Array.fill[Boolean](ui.length)(false)
     val vjChanged = Array.fill[Boolean](vj.length)(false)
@@ -392,17 +409,22 @@ class TransportationTableau(
     while ( filledUiIndices.nonEmpty || filledVjIndices.nonEmpty ) {
       if (filledUiIndices.nonEmpty) {
         val nextUiIndex = filledUiIndices.dequeue
-        for (p <- basicPairs)
-          if ( (p._1 == nextUiIndex) && !vjChanged(p._2) )
+        for (p <- basicPairs) {
+          if ( (p._1 == nextUiIndex) && !vjChanged(p._2) ) {
             setVj(p._2, (linkFlowCosts(p._1)(p._2) - ui(p._1)))
+          }
+        }
       }
       else {
         val nextVjIndex = filledVjIndices.dequeue
-        for (p <- basicPairs)
-          if ( (p._2 == nextVjIndex) && !uiChanged(p._1) )
+        for (p <- basicPairs) {
+          if ( (p._2 == nextVjIndex) && !uiChanged(p._1) ) {
             setUi(p._1, (linkFlowCosts(p._1)(p._2) - vj(p._2)))
+          }
+        }
       }
     }
+    
   }
 
   /** Returns the "star pair" that needs to have it's allocation increased
