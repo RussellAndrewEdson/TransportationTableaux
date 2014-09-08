@@ -38,7 +38,7 @@ class GridCell extends GridPanel(2,2) {
   border = LineBorder(Color.BLACK)
 
   minimumSize = new Dimension(60,40)
-  //maximumSize = new Dimension(60,40)
+  maximumSize = new Dimension(60,40)
   preferredSize = new Dimension(60,40)
 
 

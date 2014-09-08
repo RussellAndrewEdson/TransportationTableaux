@@ -6,20 +6,27 @@
 import swing._
 import Swing._
 import java.awt.Color
+import event._
 
 object TestGUI extends SimpleSwingApplication {
   
   def top = new MainFrame {
-    title = "Test for TransportationTableaux"
+    title = "TransportationTableaux v0.1"
 
-    val suppliesField = new TextField()
-    val demandsField = new TextField()
+    val suppliesField = new TextField("3")
+    val demandsField = new TextField("3")
 
-    val resetButton = new Button {
-      text = "Reset"
+    val resizeButton = new Button {
+      text = "Resize"
     }
 
-    val status = new Label("Status goes here")
+    // Statuses go here for now.
+    val InitialStatus =        "Enter the supplies, demands and costs.        "
+    val AfterNorthWestCorner = "Finished North-West corner rule.              "
+    val AdjustedAllocations =  "Adjusted tableau allocations.                 "
+    val OptimumReached =       "Optimum solution reached.                     "
+
+    val status = new Label(InitialStatus)
 
     val stepButton = new Button {
       text = "Step"
@@ -36,7 +43,7 @@ object TestGUI extends SimpleSwingApplication {
       contents += suppliesField
       contents += new Label("Demands: ")
       contents += demandsField
-      contents += resetButton
+      contents += resizeButton
     }
 
     //val middle = new Table(5,5)
@@ -44,7 +51,7 @@ object TestGUI extends SimpleSwingApplication {
     //  for (i <- 1 to 9) contents += new GridCellView()
     //}
 
-    val middle = new TableauView(3,3)
+    var middle = new TableauView(3,3)
 
     val controlPanel = new BorderPanel() {
       border = LineBorder(Color.BLACK)
@@ -61,5 +68,76 @@ object TestGUI extends SimpleSwingApplication {
       layout += middle -> BorderPanel.Position.Center
       layout += controlPanel -> BorderPanel.Position.South
     }
+
+    listenTo(resizeButton)
+    listenTo(stepButton)
+    listenTo(solveButton)
+
+    var tableau = new TransportationTableau( middle.getSupplies(), 
+                                             middle.getDemands(),
+                                             middle.getLinkFlowCosts() )
+    
+    var tableauCreated = false
+
+
+    def setTableauValues(): Unit = {
+      middle.setUi(tableau.ui)
+      middle.setVj(tableau.vj)
+      middle.setAllocations(tableau.allocations)
+    }
+
+    reactions += {
+      case ButtonClicked(component) if component == resizeButton =>
+        middle = new TableauView(suppliesField.text.toInt, demandsField.text.toInt)
+        contents = new BorderPanel() {
+          layout += specPanel -> BorderPanel.Position.North
+          layout += middle -> BorderPanel.Position.Center
+          layout += controlPanel -> BorderPanel.Position.South
+        }
+        status.text = InitialStatus
+        stepButton.enabled = true
+        solveButton.enabled = true
+        repaint()
+        tableauCreated = false
+
+      case ButtonClicked(component) if component == stepButton =>
+        if (!tableauCreated) {
+          tableau = new TransportationTableau( middle.getSupplies(),
+                                               middle.getDemands(),
+                                               middle.getLinkFlowCosts() )
+          tableauCreated = true
+          tableau.northWestCornerRule()
+          status.text = AfterNorthWestCorner
+        }
+        else {
+          tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
+          status.text = AdjustedAllocations
+        }
+
+        if (tableau.isOptimal) {
+          stepButton.enabled = false
+          solveButton.enabled = false
+          status.text = OptimumReached
+        }
+        setTableauValues()
+
+      case ButtonClicked(component) if component == solveButton =>
+        if (!tableauCreated) {
+          tableau = new TransportationTableau( middle.getSupplies(),
+                                               middle.getDemands(),
+                                               middle.getLinkFlowCosts() )
+          tableauCreated = true
+          tableau.northWestCornerRule()
+        }
+        while (!tableau.isOptimal) {
+          tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
+        }
+        setTableauValues()
+        stepButton.enabled = false
+        solveButton.enabled = false
+        status.text = OptimumReached
+
+    }
+
   }
 }
