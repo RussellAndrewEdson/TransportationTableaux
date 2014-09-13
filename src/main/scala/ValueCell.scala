@@ -21,28 +21,44 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the ValueCell.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
+/** A displayable cell used for the cells of the ui and vj dual
+  * variable lists. The cell contains a single uneditable value.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
 class ValueCell extends BorderPanel {
+
+  /** The default (ui/vj) value for a new cell is 0. */
   private val DefaultValue = 0
 
+  /** The value of this cell is displayed in the center. */
   private val value = new Label(DefaultValue.toString)
 
+  /* Cell embellishments. We have a line border to highlight the boundaries
+   * of the cell, and the size of the cell is fixed in the list.
+   * TODO: The sizing may change later on if required, but for now the 
+   * program seems to work best when the cells all have the same shape.
+   */
+  border = LineBorder(Color.BLACK)
   minimumSize = new Dimension(60,40)
   //maximumSize = new Dimension(60,40)
   preferredSize = new Dimension(60,40)
 
-
-  border = LineBorder(Color.BLACK)
-
+  /* The cell contains only the single value, displayed in the center. */
   layout += value -> BorderPanel.Position.Center
 
+  /** Sets the displayed value for this cell to the given integer.
+    *
+    * @param newValue The new value for the cell to display.
+    */
   def setValue(newValue: Int) {
     value.text = newValue.toString
   }
+
 }
