@@ -27,8 +27,8 @@ import swing._
 import Swing._
 
 class TableauView(supplyCount: Int, demandCount: Int) extends BorderPanel {
-  private val supplies = new SuppliesView(supplyCount)
-  private val demands = new DemandsView(demandCount)
+  private val supplies = new SupplyView(supplyCount)
+  private val demands = new DemandView(demandCount)
 
   private val ui = new UiView(supplyCount)
   private val vj = new VjView(demandCount)

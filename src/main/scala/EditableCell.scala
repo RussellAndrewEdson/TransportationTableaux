@@ -21,27 +21,44 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the EditableCell.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
+/** A displayable cell used for the cells of the supply and demand
+  * lists. This cell contains a value that can be edited by the user.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
 class EditableCell extends BorderPanel {
+
+  /** The default value for a supply/demand is 0. */
   private val DefaultValue = 0
 
+  /** The value of this cell is displayed in the center, and
+    * can be modified by the user.
+    */
   private val value = new TextField(DefaultValue.toString)
 
+  /* Cell embellishments. We have a line border to highlight the boundaries
+   * of the cell, and the size of the cell is fixed in the list.
+   * TODO: The sizing may change later on if required, but for now the
+   * program seems to work best when the cells all have the same shape.
+   */
   border = LineBorder(Color.BLACK)
-
   minimumSize = new Dimension(60,40)
   //maximumSize = new Dimension(60,40)
   preferredSize = new Dimension(60,40)
 
-
+  /* The cell contains only the single editable value, in the center. */
   layout += value -> BorderPanel.Position.Center
 
+  /** Returns the current displayed value of this cell.
+    *
+    * @return The integer value that is displayed by the cell.
+    */
   def getValue(): Int = value.text.toInt
 
 }
