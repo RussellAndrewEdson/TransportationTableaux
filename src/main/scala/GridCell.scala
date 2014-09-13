@@ -35,19 +35,19 @@ import java.awt.Color
   */
 class GridCell extends GridPanel(2,2) {
 
-  /* The default allocation value for a new cell is 0. */
+  /** The default allocation value for a new cell is 0. */
   private val DefaultAllocation = 0
 
-  /* The default cost value for a new cell is 0. */
+  /** The default cost value for a new cell is 0. */
   private val DefaultCost = 0
 
-  /* The allocation for the grid cell is displayed in the bottom-left. */
+  /** The allocation for the grid cell is displayed in the bottom-left. */
   private val allocation = new Label(DefaultAllocation.toString)
 
-  /* The link-flow cost for this cell is displayed in the top-right corner.
-   * The user supplies this value during the problem definition, so it is
-   * editable (at least to start with.)
-   */
+  /** The link-flow cost for this cell is displayed in the top-right corner.
+    * The user supplies this value during the problem definition, so it is
+    * editable (at least to start with.)
+    */
   private val linkFlowCost = new TextField(DefaultCost.toString)
 
   /* Cell embellishments. We have a line border to highlight the boundaries
@@ -70,16 +70,16 @@ class GridCell extends GridPanel(2,2) {
   contents += allocation      // Bottom-left
   contents += new Label("")   // Bottom-right
 
-  /* Returns the current value of the link-flow cost assigned to this cell.
-   *
-   * @return The value of the link-flow cost.
-   */
+  /** Returns the current value of the link-flow cost assigned to this cell.
+    *
+    * @return The value of the link-flow cost.
+    */
   def getCost(): Int = linkFlowCost.text.toInt
 
-  /* Sets the allocation for this cell to the given integer value.
-   *
-   * @param value The new value for the allocation.
-   */
+  /** Sets the allocation for this cell to the given integer value.
+    *
+    * @param value The new value for the allocation.
+    */
   def setAllocation(value: Int) {
     allocation.text = value.toString
   }
