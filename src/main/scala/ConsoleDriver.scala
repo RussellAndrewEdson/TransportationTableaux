@@ -21,10 +21,25 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// Code for the Console driver. (WIP)
-
 import java.util.Scanner
 
+/** The console version of the program. Prompts the user for the supplies,
+  * demands, and link-flow costs, which are entered one by one. The program
+  * then balances the Transportation problem if necessary, and constructs
+  * the TransportationTableau object to solve the problem. It then prints
+  * the successive tableaux for the solution, including the basic solution,
+  * the total cost, and also the star pair and cycle used to create the next
+  * tableau in the sequence. The optimal cost is printed at the end.
+  *
+  * Note that this console driver employs very little error-checking. The
+  * main (user-friendly) program will be the GUI, and this console version
+  * is used mainly for testing purposes -- as such, almost no effort has 
+  * been made towards cleaning up input, or sanity-checking the actual
+  * Transportation problem that is to be solved.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 1.0
+  */
 object ConsoleDriver extends App {
   /** We define the width of each square of the printed grid.
     * This number is arbitrary -- larger widths can increase readability
