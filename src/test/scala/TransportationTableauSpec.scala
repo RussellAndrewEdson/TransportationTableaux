@@ -1051,5 +1051,61 @@ class TransportationTableauSpec extends FlatSpec {
     assert(example6.step4.isOptimal == true)
   }
 
+  // END EXAMPLE
+
+  // Pathological example (0supply-0demand)
+  def example7 = 
+    new {
+      val supplies = Array[Int](0)
+      val demands = Array[Int](0)
+      val costs = Array( Array(0) )
+
+      /* The initial -- and optimal -- tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+    }
+
+  "The pathological 0-supply, 0-demand tableau" should
+      "be initialised with supplies (0)" in {
+    assert(example7.initial.supplies.deep == Array(0).deep)
+  }
+
+  it should "be initialised with demands (0)" in {
+    assert(example7.initial.demands.deep == Array(0).deep)
+  }
+
+  it should "have link-flow costs ((0))" in {
+    assert(example7.initial.linkFlowCosts.deep == Array(Array(0)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example7.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example7.initial.ui.deep == Array(0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example7.initial.vj.deep == Array(0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example7.initial.indices == 
+        (for (i <- 0 until 1; j <- 0 until 1) yield (i,j)) )
+  }
+
+  it should "start with a cost of 0 (no allocations)" in {
+    assert(example7.initial.cost == 0)
+  }
+
+  it should "be optimal already" in {
+    assert(example7.initial.isOptimal == true)
+  }
+
+  it should "provide an empty basic solution" in {
+    assert(example7.initial.basicSolution == List())
+  }
+
+  // END EXAMPLE
 }
 
