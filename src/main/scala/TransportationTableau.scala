@@ -83,7 +83,7 @@
   * @param linkFlowCosts The matrix of link-flow costs for supply to demand.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 1.1
+  * @version 1.2
   */
 class TransportationTableau(
     val supplies: Array[Int],
@@ -280,15 +280,25 @@ class TransportationTableau(
     *
     * The optimum will be reached when we have dual-feasibility, ie. when 
     * the sum of the solved ui and vj values is less than the cost value.
-    * (Note that we always return false if no allocations have been made yet.)
+    * (Note that we always return false if no allocations have been made yet,
+    * unless we have the pathological 0supply-0demand case.)
     *
     * @return True if the tableau is optimal, false if not.
     */
-  def isOptimal(): Boolean = 
-    if (allocations.flatten forall { _ == 0 }) 
+  def isOptimal(): Boolean = {
+    if (supplies.forall { _ == 0 } || demands.forall { _ == 0 }) {
+      /* This is the pathological 0supply-0demand case. We consider
+       * this case to be optimal automatically.
+       */
+      true
+    }
+    else if (allocations.flatten forall { _ == 0 }) {
       false
-    else
+    }
+    else {
       indices.forall { p => ui(p._1) + vj(p._2) <= linkFlowCosts(p._1)(p._2) }
+    }
+  }
 
   /** Returns the cycle in a given set of pairs, provided exactly one cycle
     * exists. If no cycle exists, this method returns an empty list.
