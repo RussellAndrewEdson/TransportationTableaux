@@ -83,7 +83,7 @@ class GridCell extends GridPanel(2,2) {
     *
     * @param value The new value for the allocation.
     */
-  def setAllocation(value: Int) {
+  def setAllocation(value: Int): Unit = {
     allocation.text = value.toString
   }
 

@@ -59,7 +59,7 @@ class ValueCell extends BorderPanel {
     *
     * @param newValue The new value for the cell to display.
     */
-  def setValue(newValue: Int) {
+  def setValue(newValue: Int): Unit = {
     value.text = newValue.toString
   }
 
