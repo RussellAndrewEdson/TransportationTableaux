@@ -21,27 +21,49 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the UiView.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
-class UiView(length: Int) extends BoxPanel(Orientation.Vertical) {
+/** A displayed list of the ui dual variables for the tableau.
+  * The size of this list corresponds directly to the number of
+  * supplies to the Transportation problem.
+  *
+  * @constructor Create a new displayed list in the UI with the
+  *              given number of cells.
+  * @param cellCount The number of cells for the list.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
+class UiView(val cellCount: Int) 
+    extends BoxPanel(Orientation.Vertical) {
+
+  /** The indices for the displayed list. */
+  val indices = for { i <- 0 until cellCount } yield i
+
+  /* We surround the list of ui dual variables with a border,
+   * and a title that easily indicates the list's purpose.
+   */
   border = TitledBorder(LineBorder(Color.BLACK), "Ui")
 
-  private val ui = new Array[ValueCell](length)
-  for (i <- 0 until ui.length) ui(i) = new ValueCell()
+  /* The cells are instantiated and placed in the list one by one. */
+  private val cells = new Array[ValueCell](cellCount)
+  indices.foreach { i => cells(i) = new ValueCell() }
+  indices.foreach { i => contents += cells(i) }
 
-  for (uiCell <- ui) contents += uiCell
-
-  def setUi(uiValues: Array[Int]) {
+  /** Sets the displayed ui values to those in the given array.
+    *
+    * (This method is provided for convenience; the input can simply be
+    * the output of the .ui() method of the current TransportationTableau
+    * object.)
+    *
+    * @param uiValues An array for the ui values.
+    */
+  def setUi(uiValues: Array[Int]): Unit = {
     // Error checking?
-    for (i <- 0 until ui.length) {
-      ui(i).setValue(uiValues(i))
-    }
-
-    // Might need to repaint the ui view.
+    indices.foreach { i => cells(i).setValue(uiValues(i)) }
   }
+
 }

@@ -84,7 +84,7 @@ class GridView(val rowCount: Int, val columnCount: Int)
     *
     * @param allocations A 2-dimensional integer array of allocation values.
     */
-  def setAllocations(allocations: Array[Array[Int]]) {
+  def setAllocations(allocations: Array[Array[Int]]): Unit = {
     // Error checking?
     indices.foreach {
       p => cells(p._1)(p._2).setAllocation(allocations(p._1)(p._2))
