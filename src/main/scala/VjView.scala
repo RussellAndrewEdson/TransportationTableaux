@@ -21,27 +21,49 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the VjView.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
-class VjView(length: Int) extends BoxPanel(Orientation.Horizontal) {
+/** A displayed list of the vj dual variables for the tableau.
+  * The size of this list corresponds directly to the number of
+  * demands for the Transportation problem.
+  *
+  * @constructor Create a new displayed list in the UI with the
+  *              given number of cells.
+  * @param cellCount The number of cells for the list.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
+class VjView(val cellCount: Int) 
+    extends BoxPanel(Orientation.Horizontal) {
+
+  /** The indices for the displayed list. */
+  val indices = for { j <- 0 until cellCount } yield j
+
+  /* We surround the list of vj dual variables with a border,
+   * and a title that easily indicates the list's purpose.
+   */
   border = TitledBorder(LineBorder(Color.BLACK), "Vj")
 
-  private val vj = new Array[ValueCell](length)
-  for (j <- 0 until vj.length) vj(j) = new ValueCell()
+  /* The cells are instantiated and placed in the list one by one. */
+  private val cells = new Array[ValueCell](cellCount)
+  indices.foreach { j => cells(j) = new ValueCell() }
+  indices.foreach { j => contents += cells(j) }
 
-  for (vjCell <- vj) contents += vjCell
-
-  def setVj(vjValues: Array[Int]) {
+  /** Sets the displayed vj values to those in the given array.
+    *
+    * (This method is provided for convenience; the input can simply be
+    * the output of the .vj() method of the current TransportationTableau
+    * object.)
+    *
+    * @param vjValues An array for the vj values.
+    */
+  def setVj(vjValues: Array[Int]): Unit = {
     // Error checking?
-    for (j <- 0 until vj.length) {
-      vj(j).setValue(vjValues(j))
-    }
-
-    // Might need to redraw.
+    indices.foreach { j => cells(j).setValue(vjValues(j)) }
   }
+
 }
