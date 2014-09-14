@@ -29,6 +29,8 @@ import java.awt.Color
 /** A displayable cell used for the cells of the ui and vj dual
   * variable lists. The cell contains a single uneditable value.
   *
+  * @constructor Create a new cell with a default value (0).
+  *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
   * @version 0.1
   */

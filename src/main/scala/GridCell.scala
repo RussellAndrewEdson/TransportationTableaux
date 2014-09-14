@@ -30,6 +30,9 @@ import java.awt.Color
   * view. The cell contains a current allocation value in the bottom-left, and
   * a link-flow cost in the top-right.
   *
+  * @constructor Create a new grid cell with a default allocation (0) and 
+  *              link-flow cost (0).
+  *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
   * @version 0.1
   */

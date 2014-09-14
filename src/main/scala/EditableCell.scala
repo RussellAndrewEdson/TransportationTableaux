@@ -29,6 +29,8 @@ import java.awt.Color
 /** A displayable cell used for the cells of the supply and demand
   * lists. This cell contains a value that can be edited by the user.
   *
+  * @constructor Create a new editable cell with a default value (0).
+  *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
   * @version 0.1
   */
