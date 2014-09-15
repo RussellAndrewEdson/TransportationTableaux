@@ -1107,5 +1107,228 @@ class TransportationTableauSpec extends FlatSpec {
   }
 
   // END EXAMPLE
+
+
+  // Example 8
+  def example8 = 
+    new {
+      val supplies = Array[Int](175, 75, 200)
+      val demands = Array[Int](100, 50, 100, 200)
+      val costs = Array(
+          Array(14, 10, 12, 8), Array(7, 7, 10, 9), Array(13, 10, 4, 9) )
+
+      /* The initial tableau. */
+      val initial = new TransportationTableau(supplies, demands, costs)
+
+      /* The tableau after the North-West corner rule. */
+      val step1 = new TransportationTableau(supplies, demands, costs)
+      step1.northWestCornerRule()
+
+      /* The tableau after the 1st adjustment. */
+      val step2 = new TransportationTableau(supplies, demands, costs)
+      step2.northWestCornerRule()
+      step2.adjustAllocations(step2.cycleTraversal(step2.starPair))
+
+      /* The tableau after the 2nd adjustment. */
+      val step3 = new TransportationTableau(supplies, demands, costs)
+      step3.northWestCornerRule()
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+      step3.adjustAllocations(step3.cycleTraversal(step3.starPair))
+
+      /* The tableau after the 3rd adjustment. */
+      val step4 = new TransportationTableau(supplies, demands, costs)
+      step4.northWestCornerRule()
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+      step4.adjustAllocations(step4.cycleTraversal(step4.starPair))
+
+      /* The tableau after the 4th adjustment. */
+      val step5 = new TransportationTableau(supplies, demands, costs)
+      step5.northWestCornerRule()
+      step5.adjustAllocations(step5.cycleTraversal(step5.starPair))
+      step5.adjustAllocations(step5.cycleTraversal(step5.starPair))
+      step5.adjustAllocations(step5.cycleTraversal(step5.starPair))
+      step5.adjustAllocations(step5.cycleTraversal(step5.starPair))
+
+      /* The tableau after the 5th adjustment. */
+      val step6 = new TransportationTableau(supplies, demands, costs)
+      step6.northWestCornerRule()
+      step6.adjustAllocations(step6.cycleTraversal(step6.starPair))
+      step6.adjustAllocations(step6.cycleTraversal(step6.starPair))
+      step6.adjustAllocations(step6.cycleTraversal(step6.starPair))
+      step6.adjustAllocations(step6.cycleTraversal(step6.starPair))
+      step6.adjustAllocations(step6.cycleTraversal(step6.starPair))
+    }
+
+  "The Example 8 tableau" should 
+      "be initialised with supplies (175, 75, 200)" in {
+    assert(example8.initial.supplies.deep == Array(175, 75, 200).deep)
+  }
+
+  it should "be initialised with demands (100, 50, 100, 200)" in {
+    assert(example8.initial.demands.deep == Array(100, 50, 100, 200).deep)
+  }
+
+  it should 
+      "have link-flow costs ((14,10,12,8), (7,7,10,9), (13,10,4,9))" in {
+    assert(example8.initial.linkFlowCosts.deep ==
+        Array(Array(14,10,12,8), Array(7,7,10,9), Array(13,10,4,9)).deep)
+  }
+
+  it should "have all allocations initialised to 0" in {
+    assert(example8.initial.allocations.flatten.forall {_ == 0})
+  }
+
+  it should "not be optimal before we've started" in {
+    assert(example8.initial.isOptimal == false)
+  }
+
+  it should "not provide a basic solution before we've started" in {
+    assert(example8.initial.basicSolution == List())
+  }
+
+  it should "start with a cost of 0 (no allocations made yet)" in {
+    assert(example8.initial.cost == 0)
+  }
+
+  it should "have the ui dual variables initialised to 0" in {
+    assert(example8.initial.ui.deep == Array(0,0,0).deep)
+  }
+
+  it should "have the vj dual variables initialised to 0" in {
+    assert(example8.initial.vj.deep == Array(0,0,0,0).deep)
+  }
+
+  it should "provide the correct set of indices when asked" in {
+    assert(example8.initial.indices ==
+        (for (i <- 0 until 3; j <- 0 until 4) yield (i,j)) )
+  }
+
+  it should "complete the North-West corner rule without error" in {
+    example8.initial.northWestCornerRule()
+  }
+
+  "After the North-West corner rule, the Example 8 tableau" should
+      "then have the allocations ((100,50,25,0),(0,0,75,0),(0,0,0,200))" in {
+    assert(example8.step1.allocations.deep == 
+        Array(Array(100,50,25,0), Array(0,0,75,0), Array(0,0,0,200)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(0,2),(1,2),(1,3),(2,3)" in {
+    assert(example8.step1.basicSolution.toSet ==
+        Set((0,0), (0,1), (0,2), (1,2), (1,3), (2,3)) )
+  }
+
+  it should "have a cost of 4750" in {
+    assert(example8.step1.cost == 4750)
+  }
+
+  it should "have ui = (0, -2, -2)" in {
+    assert(example8.step1.ui.deep == Array(0, -2, -2).deep)
+  }
+
+  it should "have vj = (14, 10, 12, 11)" in {
+    assert(example8.step1.vj.deep == Array(14, 10, 12, 11).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example8.step1.isOptimal == false)
+  }
+
+  it should "have its star pair as (0,3)" in {
+    assert(example8.step1.starPair == (0,3))
+  }
+
+  it should "have the cycle (0,3)->(0,2)->(1,2)->(1,3)" in {
+    assert(example8.step1.cycleTraversal(example8.step1.starPair) ==
+        List((0,3), (0,2), (1,2), (1,3)) )
+  }
+
+  it should "adjust allocations along the cycle without error" in {
+    example8.step1.adjustAllocations(
+        example8.step1.cycleTraversal(example8.step1.starPair))
+  }
+
+  "After the 1st adjustment, the Example 8 tableau" should
+      "then have the allocations ((100,50,25,0),(0,0,75,0),(0,0,0,200))" in {
+    assert(example8.step2.allocations.deep ==
+        Array(Array(100,50,25,0), Array(0,0,75,0), Array(0,0,0,200)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(0,2),(0,3),(1,2),(2,3)" in {
+    assert(example8.step2.basicSolution.toSet ==
+        Set((0,0), (0,1), (0,2), (0,3), (1,2), (2,3)) )
+  }
+
+  it should "have a cost of 4750" in {
+    assert(example8.step2.cost == 4750)
+  }
+
+  it should "have ui = (0, -2, 1)" in {
+    assert(example8.step2.ui.deep == Array(0, -2, 1).deep)
+  }
+
+  it should "have vj = (14, 10, 12, 8)" in {
+    assert(example8.step2.vj.deep == Array(14, 10, 12, 8).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example8.step2.isOptimal == false)
+  }
+
+  it should "have its star pair as (1,0)" in {
+    assert(example8.step2.starPair == (1,0))
+  }
+
+  it should "have the cycle (1,0)->(1,2)->(0,2)->(0,0)" in {
+    assert(example8.step2.cycleTraversal(example8.step2.starPair) ==
+        List((1,0), (1,2), (0,2), (0,0)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example8.step2.adjustAllocations(
+        example8.step2.cycleTraversal(example8.step2.starPair))
+  }
+
+  "After the 2nd adjustment, the Example 8 tableau" should
+      "then have the allocations ((25,50,100,0),(75,0,0,0),(0,0,0,200))" in {
+    assert(example8.step3.allocations.deep ==
+        Array(Array(25,50,100,0), Array(75,0,0,0), Array(0,0,0,200)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,1),(0,2),(0,3),(1,0),(2,3)" in {
+    assert(example8.step3.basicSolution.toSet ==
+        Set((0,0), (0,1), (0,2), (0,3), (1,0), (2,3)) )
+  }
+
+  it should "have a cost of 4375" in {
+    assert(example8.step3.cost == 4375)
+  }
+
+  it should "have ui = (0, -7, 1)" in {
+    assert(example8.step3.ui.deep == Array(0, -7, 1).deep)
+  }
+
+  it should "have vj = (14, 10, 12, 8)" in {
+    assert(example8.step3.vj.deep == Array(14, 10, 12, 8).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example8.step3.isOptimal == false)
+  }
+
+  it should "have its star pair as (2,0)" in {
+    assert(example8.step3.starPair == (2,0))
+  }
+
+  it should "have the cycle (2,0)->(2,3)->(0,3)->(0,0)" in {
+    assert(example8.step3.cycleTraversal(example8.step3.starPair) ==
+        List((2,0), (2,3), (0,3), (0,0)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example8.step3.adjustAllocations(
+        example8.step3.cycleTraversal(example8.step3.starPair))
+  }
 }
 
