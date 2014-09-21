@@ -23,6 +23,7 @@
 
 import swing._
 import Swing._
+import event._
 
 import java.awt.Color
 
@@ -56,6 +57,14 @@ class EditableCell extends BorderPanel {
 
   /* The cell contains only the single editable value, in the center. */
   layout += value -> BorderPanel.Position.Center
+
+  /* When the text field gains focus, we highlight the existing text so it
+   * can immediately be overwritten (to be user-friendly.)
+   */
+  listenTo(value)
+  reactions += {
+    case FocusGained(_, _, _) => value.selectAll()
+  }
 
   /** Returns the current displayed value of this cell.
     *

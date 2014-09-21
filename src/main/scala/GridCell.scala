@@ -23,6 +23,7 @@
 
 import swing._
 import Swing._
+import event._
 
 import java.awt.Color
 
@@ -72,6 +73,14 @@ class GridCell extends GridPanel(2,2) {
   contents += linkFlowCost    // Top-right
   contents += allocation      // Bottom-left
   contents += new Label("")   // Bottom-right
+
+  /* When the text-field gains focus, we highlight the existing text so it
+   * can immediately be overwritten (to be user-friendly.)
+   */
+  listenTo(linkFlowCost)
+  reactions += {
+    case FocusGained(_, _, _) => linkFlowCost.selectAll()
+  }
 
   /** Returns the current value of the link-flow cost assigned to this cell.
     *
