@@ -35,6 +35,7 @@ import java.awt.Color
   * @param cellCount The number of cells for the list.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
   */
 class DemandView(val cellCount: Int) 
     extends BoxPanel(Orientation.Horizontal) {
