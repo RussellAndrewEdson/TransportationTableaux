@@ -21,28 +21,51 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the DemandsView.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
-class DemandView(length: Int) extends BoxPanel(Orientation.Horizontal) {
+/** A displayed collection for the demand input values of the tableau.
+  * The user determines the size of this list when specifying the problem,
+  * and the values for the demand are entered into the text fields.
+  * 
+  * @constructor Create a new displayed list in the UI with the given
+  *              number of cells.
+  * @param cellCount The number of cells for the list.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  */
+class DemandView(val cellCount: Int) 
+    extends BoxPanel(Orientation.Horizontal) {
+
+  /* The indices for the displayed list. */
+  val indices = for { j <- 0 until cellCount } yield j
+
+  /* We surround the list of demand text fields with a border,
+   * and a title that easily indicates the list's purpose.
+   */
   border = TitledBorder(LineBorder(Color.BLACK), "Demand")
 
-  private val demands = new Array[EditableCell](length)
-  for (j <- 0 until demands.length) demands(j) = new EditableCell()
+  /* The cells are instantiated and placed in the display list one by one. */
+  private val cells = new Array[EditableCell](cellCount)
+  indices.foreach { j => cells(j) = new EditableCell() }
+  indices.foreach { j => contents += cells(j) }
 
-  for (demandCell <- demands) contents += demandCell
-
+  /** Returns an array containing the entered values for the demands.
+    *
+    * (This method is provided for convenience; the output of this method
+    * can be piped straight into the constructor for the new 
+    * TransportationTableau object.)
+    *
+    * @return An array containing the user-supplied demand values.
+    */
   def getDemands(): Array[Int] = {
     // Error checking here, or in EditableCell?
-    val demandValues = new Array[Int](demands.length)
-    for (j <- 0 until demandValues.length) {
-      demandValues(j) = demands(j).getValue()
-    }
+    val demands = new Array[Int](cellCount)
+    indices.foreach { j => demands(j) = cells(j).getValue() }
 
-    demandValues
+    demands
   }
+
 }
