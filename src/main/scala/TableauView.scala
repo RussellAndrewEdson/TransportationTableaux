@@ -21,74 +21,132 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the TableauView.
-
 import swing._
 import Swing._
 
-class TableauView(supplyCount: Int, demandCount: Int) extends BorderPanel {
+/** The visual representation of the Transportation Tableau in the GUI.
+  *
+  * This view displays the main allocation grid, surrounded by the lists
+  * containing the supplies, demands, and ui/vj dual variables. The user
+  * sets the problem specifications through this view, and the results of the
+  * problem solution at each stage can be displayed through this view.
+  * 
+  * @constructor Create a new TableauView with the given number of supplies
+  *              and demands.
+  * @param supplyCount The number of supplies for the tableau.
+  * @param demandCount The number of demands for the tableau.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
+class TableauView(val supplyCount: Int, val demandCount: Int) 
+    extends BorderPanel {
+
+  /* We define a spacer so that we can align the demands list and the
+   * vj variables list in an aesthetically pleasing way.
+   */
+  private val SpacerDimensions = new Dimension(70, 40)
+  private def spacer = new Label() {
+    minimumSize   = SpacerDimensions
+    maximumSize   = SpacerDimensions
+    preferredSize = SpacerDimensions
+  }
+
+  /* The supplies and demands are displayed in their own lists. */
   private val supplies = new SupplyView(supplyCount)
   private val demands = new DemandView(demandCount)
 
+  /* The ui and vj dual variables are displayed in their own lists. */
   private val ui = new UiView(supplyCount)
   private val vj = new VjView(demandCount)
 
+  /* The link-flow allocation grid is displayed in the center. */
   private val linkFlow = new GridView(supplyCount, demandCount)
 
-  private val demandsV = new BorderPanel {
-    layout += new Label() {
-      minimumSize = new Dimension(60,40)
-      maximumSize = new Dimension(60,40)
-      preferredSize = new Dimension(60,40)
-    } -> BorderPanel.Position.West
-
-    layout += demands -> BorderPanel.Position.Center
-
-    layout += new Label() {
-      minimumSize = new Dimension(60,40)
-      maximumSize = new Dimension(60,40)
-      preferredSize = new Dimension(60,40)
-    } -> BorderPanel.Position.East
-  }
-
-  private val vjV = new BorderPanel {
-    layout += new Label() {
-       minimumSize = new Dimension(60,40)
-       maximumSize = new Dimension(60,40)
-       preferredSize = new Dimension(60,40)
-     } -> BorderPanel.Position.West
-     
-     layout += vj -> BorderPanel.Position.Center
-     
-     layout += new Label() {
-       minimumSize = new Dimension(60,40)
-       maximumSize = new Dimension(60,40)
-       preferredSize = new Dimension(60,40)
-     } -> BorderPanel.Position.East
-  }
-
+  /* We align everything properly in the border panel. */
   layout += supplies -> BorderPanel.Position.East
-  //layout += demands -> BorderPanel.Position.South
-  layout += demandsV -> BorderPanel.Position.South
   layout += ui -> BorderPanel.Position.West
-  layout += vjV -> BorderPanel.Position.North
   layout += linkFlow -> BorderPanel.Position.Center
 
+  /* The demands view is spaced out so that it aligns more with
+   * the link-flow grid boundaries in the center.
+   */
+  layout += new BorderPanel {
+    layout += spacer -> BorderPanel.Position.West
+    layout += demands -> BorderPanel.Position.Center
+    layout += spacer -> BorderPanel.Position.East
+  } -> BorderPanel.Position.South
+
+  /* The vj variable view is spaced out so that it aligns more with
+   * the link-flow grid boundaries in the center.
+   */
+  layout += new BorderPanel {
+    layout += spacer -> BorderPanel.Position.West
+    layout += vj -> BorderPanel.Position.Center
+    layout += spacer -> BorderPanel.Position.East
+  } -> BorderPanel.Position.North
+
+  /** Returns an array containing the values for the demand.
+    *
+    * (This method is designed for its output to be piped straight into
+    * the constructor for the TransportationTableau to solve the problem.)
+    *
+    * @return An integer array containing the demand values.
+    */
   def getDemands(): Array[Int] = demands.getDemands()
 
+  /** Returns a 2-dimensional array containing the link-flow costs.
+    *
+    * (This method is designed for its output to be piped straight into
+    * the constructor for the TransportationTableau to solve the problem.)
+    *
+    * @return A 2D array containing the link-flow costs.
+    */
   def getLinkFlowCosts(): Array[Array[Int]] = linkFlow.getLinkFlowCosts()
 
+  /** Returns an array containing the values for the supply.
+    *
+    * (This method is designed for its output to be piped straight into
+    * the constructor for the TransportationTableau to solve the problem.)
+    *
+    * @return An integer array containing the supply values.
+    */
   def getSupplies(): Array[Int] = supplies.getSupplies()
 
-  def setAllocations(allocations: Array[Array[Int]]) {
+  /** Sets the displayed allocation values to those in the given array.
+    *
+    * (This method is designed so that the allocations array of the 
+    * TransportationTableau instance can be sent to this method at any stage
+    * and have its current values displayed.)
+    *
+    * @param allocations The 2D array containing the new allocation values.
+    */
+  def setAllocations(allocations: Array[Array[Int]]): Unit = {
     linkFlow.setAllocations(allocations)
   }
 
-  def setUi(uiValues: Array[Int]) {
+  /** Sets the displayed ui dual variables to those in the given array.
+    *
+    * (This method is designed so that the ui array of the
+    * TransportationTableau instance can be sent to this method at any stage
+    * and have its current values displayed.)
+    *
+    * @param uiValues An integer array containing the new ui values.
+    */
+  def setUi(uiValues: Array[Int]): Unit = {
     ui.setUi(uiValues)
   }
 
-  def setVj(vjValues: Array[Int]) {
+  /** Sets the displayed vj dual variables to those in the given array.
+    *
+    * (This method is designed so that the vj array of the
+    * TransportationTableau instance can be sent to this method at any stage
+    * and have its current values displayed.)
+    *
+    * @param vjValues An integer array containing the new vj values.
+    */
+  def setVj(vjValues: Array[Int]): Unit = {
     vj.setVj(vjValues)
   }
+
 }
