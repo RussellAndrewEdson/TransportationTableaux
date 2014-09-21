@@ -21,29 +21,52 @@
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Code for the SuppliesView.
-
 import swing._
 import Swing._
 
 import java.awt.Color
 
-class SupplyView(length: Int) extends BoxPanel(Orientation.Vertical) {
+/** A displayed collection for the supply input values of the tableau.
+  * The user determines the size of this list when specifying the problem,
+  * and the values for the supply are entered into the text fields.
+  *
+  * @constructor Create a new displayed list in the UI with the given
+  *              number of cells.
+  * @param cellCount The number of cells for the list.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
+class SupplyView(val cellCount: Int) 
+    extends BoxPanel(Orientation.Vertical) {
+
+  /* The indices for the displayed list. */
+  val indices = for { i <- 0 until cellCount } yield i
+
+  /* We surround the list of supply text fields with a border,
+   * and a title that easily indicates the list's purpose.
+   */
   border = TitledBorder(LineBorder(Color.BLACK), "Supply")
 
-  private val supplies = new Array[EditableCell](length)
-  for (i <- 0 until supplies.length) supplies(i) = new EditableCell()
+  /* The cells are instantiated and placed in the display list one by one. */
+  private val cells = new Array[EditableCell](cellCount)
+  indices.foreach { i => cells(i) = new EditableCell() }
+  indices.foreach { i => contents += cells(i) }
 
-  for (supplyCell <- supplies) contents += supplyCell
-
+  /** Returns an array containing the entered values for the supplies.
+    *
+    * (This method is provided for convenience; the output of this method
+    * can be piped straight into the constructor for the new
+    * TransportationTableau object.)
+    *
+    * @return An array containing the user-provided supply values.
+    */
   def getSupplies(): Array[Int] = {
     // Error checking (here, or in EditableCell?)
-    val supplyValues = new Array[Int](supplies.length)
-    for (i <- 0 until supplyValues.length) {
-      supplyValues(i) = supplies(i).getValue()
-    }
+    val supplies = new Array[Int](cellCount)
+    indices.foreach { i => supplies(i) = cells(i).getValue() }
 
-    supplyValues
+    supplies
   }
 
 }
