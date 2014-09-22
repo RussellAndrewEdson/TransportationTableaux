@@ -1524,5 +1524,89 @@ class TransportationTableauSpec extends FlatSpec {
     example9.initial.northWestCornerRule()
   }
 
+  "After the North-West corner rule, the Example 9 tableau" should
+      "then have the allocations ((15,0,0,0),(3,14,0,0),(0,1,10,7))" in {
+    assert(example9.step1.allocations.deep ==
+        Array(Array(15,0,0,0), Array(3,14,0,0), Array(0,1,10,7)).deep)
+  }
+
+  it should "have the basic solution (0,0),(1,0),(1,1),(2,1),(2,2),(2,3)" in {
+    assert(example9.step1.basicSolution.toSet ==
+        Set((0,0), (1,0), (1,1), (2,1), (2,2), (2,3)) )
+  }
+
+  it should "have a cost of 160" in {
+    assert(example9.step1.cost == 160)
+  }
+
+  it should "have ui = (0, 2, 3)" in {
+    assert(example9.step1.ui.deep == Array(0, 2, 3).deep)
+  }
+
+  it should "have vj = (1, 0, 4, 2)" in {
+    assert(example9.step1.vj.deep == Array(1, 0, 4, 2).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example9.step1.isOptimal == false)
+  }
+
+  it should "have its star pair as (0,2)" in {
+    assert(example9.step1.starPair == (0,2))
+  }
+
+  it should "have the cycle (0,2)->(0,0)->(1,0)->(1,1)->(2,1)->(2,2)" in {
+    assert(example9.step1.cycleTraversal(example9.step1.starPair) ==
+        List((0,2), (0,0), (1,0), (1,1), (2,1), (2,2)) )
+  }
+
+  it should "adjust allocations along the cycle without error" in {
+    example9.step1.adjustAllocations(
+        example9.step1.cycleTraversal(example9.step1.starPair))
+  }
+
+  "After the 1st adjustment, the Example 9 tableau" should
+      "then have the allocations ((5,0,10,0),(13,4,0,0),(0,11,0,7))" in {
+    assert(example9.step2.allocations.deep ==
+        Array(Array(5,0,10,0), Array(13,4,0,0), Array(0,11,0,7)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,2),(1,0),(1,1),(2,1),(2,3)" in {
+    assert(example9.step2.basicSolution.toSet ==
+        Set((0,0), (0,2), (1,0), (1,1), (2,1), (2,3)) )
+  }
+
+  it should "have a cost of 150" in {
+    assert(example9.step2.cost == 150)
+  }
+
+  it should "have ui = (0, 2, 3)" in {
+    assert(example9.step2.ui.deep == Array(0, 2, 3).deep)
+  }
+
+  it should "have vj = (1, 0, 3, 2)" in {
+    assert(example9.step2.vj.deep == Array(1, 0, 3, 2).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example9.step2.isOptimal == false)
+  }
+
+  it should "have its star pair as (1,3)" in {
+    assert(example9.step2.starPair == (1,3))
+  }
+
+  it should "have the cycle (1,3)->(1,1)->(2,1)->(2,3)" in {
+    assert(example9.step2.cycleTraversal(example9.step2.starPair) ==
+        List((1,3), (1,1), (2,1), (2,3)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example9.step2.adjustAllocations(
+        example9.step2.cycleTraversal(example9.step2.starPair))
+  }
+
+
+
 }
 
