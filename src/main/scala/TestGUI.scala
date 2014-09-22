@@ -11,7 +11,7 @@ import event._
 object TestGUI extends SimpleSwingApplication {
   
   def top = new MainFrame {
-    title = "TransportationTableaux v0.1"
+    title = "TransportationTableaux v0.2"
 
     val suppliesField = new TextField("3")
     val demandsField = new TextField("3")
@@ -23,6 +23,7 @@ object TestGUI extends SimpleSwingApplication {
     // Statuses go here for now.
     val InitialStatus =        "Enter the supplies, demands and costs.        "
     val AfterNorthWestCorner = "Finished North-West corner rule.              "
+    val FoundStarPair =        "Found star pair.                              "
     val AdjustedAllocations =  "Adjusted tableau allocations.                 "
     val OptimumReached =       "Optimum solution reached.                     "
 
@@ -45,11 +46,6 @@ object TestGUI extends SimpleSwingApplication {
       contents += demandsField
       contents += resizeButton
     }
-
-    //val middle = new Table(5,5)
-    //val middle = new GridPanel(3,3) {
-    //  for (i <- 1 to 9) contents += new GridCellView()
-    //}
 
     var middle = new TableauView(3,3)
 
@@ -78,6 +74,7 @@ object TestGUI extends SimpleSwingApplication {
                                              middle.getLinkFlowCosts() )
     
     var tableauCreated = false
+    var starPairFound = false
 
 
     def setTableauValues(): Unit = {
@@ -99,6 +96,7 @@ object TestGUI extends SimpleSwingApplication {
         solveButton.enabled = true
         repaint()
         tableauCreated = false
+        starPairFound = false
 
       case ButtonClicked(component) if component == stepButton =>
         if (!tableauCreated) {
@@ -106,20 +104,33 @@ object TestGUI extends SimpleSwingApplication {
                                                middle.getDemands(),
                                                middle.getLinkFlowCosts() )
           tableauCreated = true
+          starPairFound = false
           tableau.northWestCornerRule()
           status.text = AfterNorthWestCorner
+          setTableauValues()
+        }
+        else if (!starPairFound) {
+          middle.setStarPair(tableau.starPair)
+          status.text = FoundStarPair
+          starPairFound = true
         }
         else {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
           status.text = AdjustedAllocations
+          setTableauValues()
+          middle.clearStarPair()
+          starPairFound = false
         }
 
         if (tableau.isOptimal) {
           stepButton.enabled = false
           solveButton.enabled = false
           status.text = OptimumReached
+          setTableauValues()
+          middle.clearStarPair()
+          starPairFound = false
         }
-        setTableauValues()
+        //setTableauValues()
 
       case ButtonClicked(component) if component == solveButton =>
         if (!tableauCreated) {

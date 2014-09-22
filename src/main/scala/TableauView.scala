@@ -37,7 +37,7 @@ import Swing._
   * @param demandCount The number of demands for the tableau.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @version 0.2
   */
 class TableauView(val supplyCount: Int, val demandCount: Int) 
     extends BorderPanel {
@@ -86,6 +86,15 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     layout += spacer -> BorderPanel.Position.East
   } -> BorderPanel.Position.North
 
+  /** Clears the star pair from the tableau grid view (if it exists.)
+    *
+    * This method allows us to "clean up" the tableau after the star
+    * pair has been used to adjust the allocations already.
+    */
+  def clearStarPair(): Unit = {
+    linkFlow.clearStarPair()
+  }
+
   /** Returns an array containing the values for the demand.
     *
     * (This method is designed for its output to be piped straight into
@@ -123,6 +132,18 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     */
   def setAllocations(allocations: Array[Array[Int]]): Unit = {
     linkFlow.setAllocations(allocations)
+  }
+
+  /** Sets the star pair as the given pair in the grid view.
+    *
+    * For convenience, this method takes in a tuple argument; the output of
+    * the .starPair() method of the TransportationTableau can be piped straight
+    * into this method.
+    *
+    * @param pair The pair that will be shown as the star pair.
+    */
+  def setStarPair(pair: Tuple2[Int, Int]): Unit = {
+    linkFlow.setStarPair(pair)
   }
 
   /** Sets the displayed ui dual variables to those in the given array.

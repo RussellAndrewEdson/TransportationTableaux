@@ -35,7 +35,7 @@ import java.awt.Color
   *              link-flow cost (0).
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @version 0.2
   */
 class GridCell extends GridPanel(2,2) {
 
@@ -47,6 +47,9 @@ class GridCell extends GridPanel(2,2) {
 
   /** The allocation for the grid cell is displayed in the bottom-left. */
   private val allocation = new Label(DefaultAllocation.toString)
+
+  /** We use the top-left corner of the cell to signify the star-pair. */
+  private val star = new Label("")
 
   /** The link-flow cost for this cell is displayed in the top-right corner.
     * The user supplies this value during the problem definition, so it is
@@ -69,7 +72,7 @@ class GridCell extends GridPanel(2,2) {
    * displayed in the top-right, and the allocation is displayed in the 
    * bottom-left.
    */
-  contents += new Label("")   // Top-left
+  contents += star            // Top-left
   contents += linkFlowCost    // Top-right
   contents += allocation      // Bottom-left
   contents += new Label("")   // Bottom-right
@@ -80,6 +83,15 @@ class GridCell extends GridPanel(2,2) {
   listenTo(linkFlowCost)
   reactions += {
     case FocusGained(_, _, _) => linkFlowCost.selectAll()
+  }
+
+  /** Clears the star "*" symbol used to denote a star pair.
+    *
+    * (ie. We call this method when we no longer need to signal that this cell
+    * is the star pair. The "*" is removed from the cell in the GUI.)
+    */
+  def clearStar(): Unit = {
+    star.text = ""
   }
 
   /** Returns the current value of the link-flow cost assigned to this cell.
@@ -94,6 +106,15 @@ class GridCell extends GridPanel(2,2) {
     */
   def setAllocation(value: Int): Unit = {
     allocation.text = value.toString
+  }
+
+  /** Sets the star "*" symbol used to denote a star pair.
+    *
+    * (ie. We call this method when we need to signal that this cell is the
+    * star pair. A "*" is placed in the top-left of this cell in the GUI.)
+    */
+  def setStar(): Unit = {
+    star.text = "*"
   }
 
 }

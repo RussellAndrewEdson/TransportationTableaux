@@ -36,7 +36,7 @@ import java.awt.Color
   * @param columnCount The number of columns for the grid.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @version 0.2
   */
 class GridView(val rowCount: Int, val columnCount: Int) 
     extends GridPanel(rowCount, columnCount) {
@@ -56,6 +56,14 @@ class GridView(val rowCount: Int, val columnCount: Int)
   private val cells = Array.ofDim[GridCell](rowCount, columnCount)
   indices.foreach { p => cells(p._1)(p._2) = new GridCell() }
   indices.foreach { p => contents += cells(p._1)(p._2) }
+
+  /** Clears the star pair from the cell view (if one exists.)
+    *
+    * We call this method once we no longer need to show the star pair.
+    */
+  def clearStarPair(): Unit = {
+    indices.foreach { p => cells(p._1)(p._2).clearStar() }
+  }
 
   /** Returns a 2-dimensional array containing the user-supplied values 
     * for the link-flow costs.
@@ -89,6 +97,18 @@ class GridView(val rowCount: Int, val columnCount: Int)
     indices.foreach {
       p => cells(p._1)(p._2).setAllocation(allocations(p._1)(p._2))
     }
+  }
+
+  /** Sets the star pair in the grid (ie. labels it with a "*".)
+    *
+    * We call this method when we need to set the star pair. For convenience,
+    * it takes a tuple argument -- this can immediately be the output of the
+    * .starPair() method of the TransportationTableau.
+    *
+    * @param pair The (star) pair to be labelled with a "*" in the grid.
+    */
+  def setStarPair(pair: Tuple2[Int, Int]): Unit = {
+    cells(pair._1)(pair._2).setStar()
   }
 
 }
