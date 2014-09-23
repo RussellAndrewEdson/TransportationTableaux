@@ -24,6 +24,7 @@ object TestGUI extends SimpleSwingApplication {
     val InitialStatus =        "Enter the supplies, demands and costs.        "
     val AfterNorthWestCorner = "Finished North-West corner rule.              "
     val FoundStarPair =        "Found star pair.                              "
+    val FoundCycle =           "Found cycle.                                  "
     val AdjustedAllocations =  "Adjusted tableau allocations.                 "
     val OptimumReached =       "Optimum solution reached.                     "
 
@@ -75,6 +76,7 @@ object TestGUI extends SimpleSwingApplication {
     
     var tableauCreated = false
     var starPairFound = false
+    var cycleFound = false
 
 
     def setTableauValues(): Unit = {
@@ -97,6 +99,7 @@ object TestGUI extends SimpleSwingApplication {
         repaint()
         tableauCreated = false
         starPairFound = false
+        cycleFound = false
 
       case ButtonClicked(component) if component == stepButton =>
         if (!tableauCreated) {
@@ -105,6 +108,7 @@ object TestGUI extends SimpleSwingApplication {
                                                middle.getLinkFlowCosts() )
           tableauCreated = true
           starPairFound = false
+          cycleFound = false
           tableau.northWestCornerRule()
           status.text = AfterNorthWestCorner
           setTableauValues()
@@ -114,12 +118,19 @@ object TestGUI extends SimpleSwingApplication {
           status.text = FoundStarPair
           starPairFound = true
         }
+        else if (!cycleFound) {
+          middle.setCycle(tableau.cycleTraversal(tableau.starPair))
+          status.text = FoundCycle
+          cycleFound = true
+        }
         else {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
           status.text = AdjustedAllocations
           setTableauValues()
           middle.clearStarPair()
+          middle.clearCycle()
           starPairFound = false
+          cycleFound = false
         }
 
         if (tableau.isOptimal) {
@@ -128,7 +139,9 @@ object TestGUI extends SimpleSwingApplication {
           status.text = OptimumReached
           setTableauValues()
           middle.clearStarPair()
+          middle.clearCycle()
           starPairFound = false
+          cycleFound = false
         }
         //setTableauValues()
 

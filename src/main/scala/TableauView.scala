@@ -37,7 +37,7 @@ import Swing._
   * @param demandCount The number of demands for the tableau.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.2
+  * @version 0.3
   */
 class TableauView(val supplyCount: Int, val demandCount: Int) 
     extends BorderPanel {
@@ -86,6 +86,15 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     layout += spacer -> BorderPanel.Position.East
   } -> BorderPanel.Position.North
 
+  /** Clears the cycle from the tableau grid view if it exists.
+    *
+    * This method allows us to "clean up" the tableau after the cycle
+    * has been drawn and shown for the allocation adjustments.
+    */
+  def clearCycle(): Unit = {
+    linkFlow.clearCycle()
+  }
+
   /** Clears the star pair from the tableau grid view (if it exists.)
     *
     * This method allows us to "clean up" the tableau after the star
@@ -132,6 +141,18 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     */
   def setAllocations(allocations: Array[Array[Int]]): Unit = {
     linkFlow.setAllocations(allocations)
+  }
+
+  /** Displays the given cycle in the tableau grid view.
+    *
+    * For convenience, this method takes in a list of tuples. The output of
+    * the .cycleTraversal() method of the TransportationTableau can be 
+    * immediately piped into this method.
+    *
+    * @param cycle The cycle to be displayed in the tableau.
+    */
+  def setCycle(cycle: List[Tuple2[Int, Int]]): Unit = {
+    linkFlow.setCycle(cycle)
   }
 
   /** Sets the star pair as the given pair in the grid view.

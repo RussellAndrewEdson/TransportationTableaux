@@ -35,7 +35,7 @@ import java.awt.Color
   *              link-flow cost (0).
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.2
+  * @version 0.3
   */
 class GridCell extends GridPanel(2,2) {
 
@@ -45,11 +45,17 @@ class GridCell extends GridPanel(2,2) {
   /** The default cost value for a new cell is 0. */
   private val DefaultCost = 0
 
+  /** We store the default background colour so it can be reset safely. */
+  private val DefaultCellBackground = background
+
   /** The allocation for the grid cell is displayed in the bottom-left. */
   private val allocation = new Label(DefaultAllocation.toString)
 
   /** We use the top-left corner of the cell to signify the star-pair. */
   private val star = new Label("")
+
+  /** We use the bottom-right corner of the cell to signal plus/minus. */
+  private val plusMinus = new Label("")
 
   /** The link-flow cost for this cell is displayed in the top-right corner.
     * The user supplies this value during the problem definition, so it is
@@ -75,7 +81,7 @@ class GridCell extends GridPanel(2,2) {
   contents += star            // Top-left
   contents += linkFlowCost    // Top-right
   contents += allocation      // Bottom-left
-  contents += new Label("")   // Bottom-right
+  contents += plusMinus       // Bottom-right
 
   /* When the text-field gains focus, we highlight the existing text so it
    * can immediately be overwritten (to be user-friendly.)
@@ -85,12 +91,23 @@ class GridCell extends GridPanel(2,2) {
     case FocusGained(_, _, _) => linkFlowCost.selectAll()
   }
 
+  /** Clears the background and "+" or "-" symbol used to denote this cell as
+    * part of the current cycle.
+    *
+    * (We call this method when we no longer need to signal the cycle in the
+    * tableau.)
+    */
+  def clearCycle(): Unit = {
+    plusMinus.text = ""
+    background = DefaultCellBackground
+  }
+
   /** Clears the star "*" symbol used to denote a star pair.
     *
     * (ie. We call this method when we no longer need to signal that this cell
     * is the star pair. The "*" is removed from the cell in the GUI.)
     */
-  def clearStar(): Unit = {
+  def clearStarPair(): Unit = {
     star.text = ""
   }
 
@@ -108,12 +125,26 @@ class GridCell extends GridPanel(2,2) {
     allocation.text = value.toString
   }
 
+  /** Changes the background colour and labels this cell with a "+" or "-"
+    * to denote that it is part of the current tableau cycle.
+    *
+    * (We use this method to indicate that individual cells are part of the
+    * cycle.)
+    *
+    * @param symbol The string to display in the bottom-right corner of the
+    *               cell -- we use "+" and "-" to label the cycle pairs.
+    */
+  def setCycle(symbol: String): Unit = {
+    plusMinus.text = symbol
+    background = Color.GREEN
+  }
+
   /** Sets the star "*" symbol used to denote a star pair.
     *
     * (ie. We call this method when we need to signal that this cell is the
     * star pair. A "*" is placed in the top-left of this cell in the GUI.)
     */
-  def setStar(): Unit = {
+  def setStarPair(): Unit = {
     star.text = "*"
   }
 
