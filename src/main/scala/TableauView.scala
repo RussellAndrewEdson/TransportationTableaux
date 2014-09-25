@@ -63,10 +63,15 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
   /* The link-flow allocation grid is displayed in the center. */
   private val linkFlow = new GridView(supplyCount, demandCount)
 
+  //TODO
+  private val drawnCycle = new CycleView(linkFlow)
+
   /* We align everything properly in the border panel. */
   layout += supplies -> BorderPanel.Position.East
   layout += ui -> BorderPanel.Position.West
-  layout += linkFlow -> BorderPanel.Position.Center
+
+  //TODO
+  layout += drawnCycle -> BorderPanel.Position.Center
 
   /* The demands view is spaced out so that it aligns more with
    * the link-flow grid boundaries in the center.
@@ -93,6 +98,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     */
   def clearCycle(): Unit = {
     linkFlow.clearCycle()
+    drawnCycle.hideCycle()
   }
 
   /** Clears the star pair from the tableau grid view (if it exists.)
@@ -153,6 +159,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     */
   def setCycle(cycle: List[Tuple2[Int, Int]]): Unit = {
     linkFlow.setCycle(cycle)
+    drawnCycle.showCycle(cycle)
   }
 
   /** Sets the star pair as the given pair in the grid view.

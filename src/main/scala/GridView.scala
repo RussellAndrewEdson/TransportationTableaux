@@ -36,7 +36,7 @@ import java.awt.Color
   * @param columnCount The number of columns for the grid.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.3
+  * @version 0.4
   */
 class GridView(val rowCount: Int, val columnCount: Int) 
     extends GridPanel(rowCount, columnCount) {
@@ -63,8 +63,6 @@ class GridView(val rowCount: Int, val columnCount: Int)
     */
   def clearCycle(): Unit = {
     indices.foreach { p => cells(p._1)(p._2).clearCycle() }
-
-    // TODO: "Undraw" the cycle here.
   }
 
   /** Clears the star pair from the cell view (if one exists.)
@@ -74,6 +72,11 @@ class GridView(val rowCount: Int, val columnCount: Int)
   def clearStarPair(): Unit = {
     indices.foreach { p => cells(p._1)(p._2).clearStarPair() }
   }
+
+  /** TODO: Document this.
+    *
+    */
+  def getCellSize(): Dimension = cells(0)(0).size
 
   /** Returns a 2-dimensional array containing the user-supplied values 
     * for the link-flow costs.
@@ -124,8 +127,6 @@ class GridView(val rowCount: Int, val columnCount: Int)
 
     plusPairs.foreach  { p => cells(p._1)(p._2).setCycle("+") }
     minusPairs.foreach { p => cells(p._1)(p._2).setCycle("-") }
-
-    // TODO: Draw the cycle here. Will need to figure out how to do this.
   }
 
   /** Sets the given star pair in the grid (ie. labels it with a "*".)

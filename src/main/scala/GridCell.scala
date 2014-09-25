@@ -45,9 +45,6 @@ class GridCell extends GridPanel(2,2) {
   /** The default cost value for a new cell is 0. */
   private val DefaultCost = 0
 
-  /** We store the default background colour so it can be reset safely. */
-  private val DefaultCellBackground = background
-
   /** The allocation for the grid cell is displayed in the bottom-left. */
   private val allocation = new Label(DefaultAllocation.toString)
 
@@ -91,7 +88,7 @@ class GridCell extends GridPanel(2,2) {
     case FocusGained(_, _, _) => linkFlowCost.selectAll()
   }
 
-  /** Clears the background and "+" or "-" symbol used to denote this cell as
+  /** Clears the  "+" or "-" symbol used to denote this cell as
     * part of the current cycle.
     *
     * (We call this method when we no longer need to signal the cycle in the
@@ -99,7 +96,6 @@ class GridCell extends GridPanel(2,2) {
     */
   def clearCycle(): Unit = {
     plusMinus.text = ""
-    background = DefaultCellBackground
   }
 
   /** Clears the star "*" symbol used to denote a star pair.
@@ -125,8 +121,8 @@ class GridCell extends GridPanel(2,2) {
     allocation.text = value.toString
   }
 
-  /** Changes the background colour and labels this cell with a "+" or "-"
-    * to denote that it is part of the current tableau cycle.
+  /** Labels this cell with a "+" or "-" to denote that it is part of 
+    * the current tableau cycle.
     *
     * (We use this method to indicate that individual cells are part of the
     * cycle.)
@@ -136,7 +132,6 @@ class GridCell extends GridPanel(2,2) {
     */
   def setCycle(symbol: String): Unit = {
     plusMinus.text = symbol
-    background = Color.GREEN
   }
 
   /** Sets the star "*" symbol used to denote a star pair.
