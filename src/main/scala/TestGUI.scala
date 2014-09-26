@@ -21,12 +21,12 @@ object TestGUI extends SimpleSwingApplication {
     }
 
     // Statuses go here for now.
-    val InitialStatus =        "Enter the supplies, demands and costs.        "
-    val AfterNorthWestCorner = "Finished North-West corner rule.              "
-    val FoundStarPair =        "Found star pair.                              "
-    val FoundCycle =           "Found cycle.                                  "
-    val AdjustedAllocations =  "Adjusted tableau allocations.                 "
-    val OptimumReached =       "Optimum solution reached.                     "
+    val InitialStatus =        " Enter the supplies, demands and costs.        "
+    val AfterNorthWestCorner = " Finished North-West corner rule.              "
+    val FoundStarPair =        " Found star pair.                              "
+    val FoundCycle =           " Found cycle.                                  "
+    val AdjustedAllocations =  " Adjusted tableau allocations.                 "
+    val OptimumReached =       " Optimal solution reached.                     "
 
     val status = new Label(InitialStatus)
 
@@ -37,6 +37,9 @@ object TestGUI extends SimpleSwingApplication {
     val solveButton = new Button {
       text = "Solve"
     }
+
+    val costField = new Label("0")
+    val solutionField = new Label("No allocations yet.")
 
     val specPanel = new BoxPanel(Orientation.Horizontal) {
       border = TitledBorder(LineBorder(Color.BLACK), "Problem Size")
@@ -50,9 +53,30 @@ object TestGUI extends SimpleSwingApplication {
 
     var middle = new TableauView(3,3)
 
-    val controlPanel = new BorderPanel() {
-      border = LineBorder(Color.BLACK)
+    val solutionInfo = new BoxPanel(Orientation.Vertical) {
+      contents += new FlowPanel(FlowPanel.Alignment.Left) (
+          new Label("Cost: "),
+          costField)
+      contents += new FlowPanel(FlowPanel.Alignment.Left) (
+          new Label("Basic Solution: "))
+      contents += new FlowPanel(FlowPanel.Alignment.Center) (
+          solutionField)
+    }
 
+    //val controlPanel = new BoxPanel(Orientation.Vertical) {
+    //  contents += solutionInfo
+    //  contents += new FlowPanel(FlowPanel.Alignment.Left) (
+    //      status,
+    //      stepButton,
+    //      solveButton) {
+    //    border = LineBorder(Color.BLACK)
+    //  }
+    //}
+
+    val controlPanel = new BorderPanel() {
+      //border = LineBorder(Color.BLACK)
+
+      layout += solutionInfo -> BorderPanel.Position.North
       layout += status -> BorderPanel.Position.West
       layout += new BoxPanel(Orientation.Horizontal) {
         contents += stepButton
@@ -85,6 +109,23 @@ object TestGUI extends SimpleSwingApplication {
       middle.setAllocations(tableau.allocations)
     }
 
+    def setCost(): Unit = {
+      costField.text = tableau.cost.toString
+    }
+
+    def setBasicSolution(): Unit = {
+      def solnFormat(pair: Tuple2[Int, Int]): String = {
+        ("x<sub>%d, %d</sub>".format((pair._1 + 1), (pair._2 + 1)) + 
+        " = " + tableau.allocations(pair._1)(pair._2).toString)
+      }
+
+      // We sort the basic solution first.
+      val solnIndices = tableau.basicSolution.sorted
+
+      val soln = (solnIndices.map(p => solnFormat(p))).mkString(", &nbsp;&nbsp;")
+      solutionField.text = "<html><body>" + soln + "</body></html>"
+    }
+
     reactions += {
       case ButtonClicked(component) if component == resizeButton =>
         middle = new TableauView(suppliesField.text.toInt, demandsField.text.toInt)
@@ -94,6 +135,9 @@ object TestGUI extends SimpleSwingApplication {
           layout += controlPanel -> BorderPanel.Position.South
         }
         status.text = InitialStatus
+        costField.text = "0"
+        solutionField.text = "No allocations yet."
+
         stepButton.enabled = true
         solveButton.enabled = true
         repaint()
@@ -111,6 +155,8 @@ object TestGUI extends SimpleSwingApplication {
           cycleFound = false
           tableau.northWestCornerRule()
           status.text = AfterNorthWestCorner
+          setCost()
+          setBasicSolution()
           setTableauValues()
         }
         else if (!starPairFound) {
@@ -127,6 +173,8 @@ object TestGUI extends SimpleSwingApplication {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
           status.text = AdjustedAllocations
           setTableauValues()
+          setCost()
+          setBasicSolution()
           middle.clearStarPair()
           middle.clearCycle()
           starPairFound = false
@@ -138,6 +186,8 @@ object TestGUI extends SimpleSwingApplication {
           solveButton.enabled = false
           status.text = OptimumReached
           setTableauValues()
+          setCost()
+          setBasicSolution()
           middle.clearStarPair()
           middle.clearCycle()
           starPairFound = false
@@ -157,6 +207,8 @@ object TestGUI extends SimpleSwingApplication {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
         }
         setTableauValues()
+        setCost()
+        setBasicSolution()
         stepButton.enabled = false
         solveButton.enabled = false
         status.text = OptimumReached
