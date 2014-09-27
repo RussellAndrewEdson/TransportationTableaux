@@ -21,9 +21,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import swing._
-import Swing._
-import event._
+import swing.{ BorderPanel, BoxPanel, Button, FlowPanel, Label }
+import swing.{ MainFrame, Orientation, SimpleSwingApplication, TextField }
+import swing.Swing.{ LineBorder, TitledBorder }
+import swing.event.{ ButtonClicked }
 
 import java.awt.Color
 
@@ -35,7 +36,7 @@ import java.awt.Color
   * The basic solution and cost are also shown for each new allocation.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 1.0
+  * @version 0.3
   */
 object GuiDriver extends SimpleSwingApplication {
   
