@@ -22,7 +22,7 @@
  */
 
 import swing.{ Dimension, GridPanel, Label, TextField }
-import swing.Swing.LineBorder
+import swing.Swing.{ LineBorder }
 import swing.event.FocusGained
 
 import java.awt.Color
