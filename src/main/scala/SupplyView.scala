@@ -35,7 +35,7 @@ import java.awt.Color
   * @param cellCount The number of cells for the list.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @version 0.2
   */
 class SupplyView(val cellCount: Int) 
     extends BoxPanel(Orientation.Vertical) {
