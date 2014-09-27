@@ -21,39 +21,66 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// Code for the CycleView.
+import swing.{ BorderPanel }
 
-import swing._
-import Swing._
+import java.awt.{ BasicStroke, Color, geom, Graphics2D, Point }
 
-import java.awt.{Color, Graphics2D, Point, BasicStroke, geom}
-
+/** The visual representation of the cycle for the Transportation tableau.
+  *
+  * This view draws itself on top of the grid in the tableau view. When the
+  * cycle is drawn, the grid is still visible beneath the lines of the cycle.
+  *
+  * @constructor Create a new CycleView to draw itself on top of the given
+  *              grid in the tableau view.
+  * @param grid The grid that this cycle will be drawn on.
+  *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 0.1
+  */
 class CycleView(val grid: GridView) extends BorderPanel {
 
+  /* We flag for whether or not the cycle should be shown on the screen. */
   private var paintCycle: Boolean = false
+
+  /* We store the cycle locally so we can paint it when required. */
   private var storedCycle: List[Tuple2[Int, Int]] = List()
 
-  opaque = false
+  /* The grid is placed behind the drawn (or not-drawn) cycle. */
   layout += grid -> BorderPanel.Position.Center
 
+  /** Returns the midpoint of the cell with the given coordinates in the
+    * grid view (so we can draw the cycle from the middle of each of its
+    * included cells.)
+    *
+    * @param cell The cell to retrieve the midpoint for.
+    * @return The midpoint of the cell.
+    */
   private def getCellMidpoint(cell: Tuple2[Int, Int]): Point = {
-    // TODO: Fix this up with relative values once we know it works!
     val cellSize = grid.getCellSize()
-
-    return new Point( (cellSize.width  / 2) + cellSize.width*(cell._2) , 
-                      (cellSize.height / 2)+ cellSize.height*(cell._1) )
+    return new Point( 
+        (cellSize.width  / 2) + (cellSize.width  * cell._2) , 
+        (cellSize.height / 2) + (cellSize.height * cell._1) )
   }
 
+  /** Hides the cycle from view if it has been drawn.
+    *
+    * (That is, we call this method when we don't want the cycle to
+    * be viewed anymore.)
+    */
   def hideCycle(): Unit = {
     paintCycle = false
-    //grid.visible = true
     repaint()
   }
 
+  /** @inheritdoc
+    *
+    * In our case, we paint the cycle over the top of the grid view if
+    * requested.
+    */
   override def paint(g: Graphics2D): Unit = {
     super.paint(g)
 
-    // Draw cycle if we want to.
+    /* We draw the cycle to the screen here if it is to be shown. */
     if (paintCycle == true) {
       for(i <- 0 until storedCycle.length) {
         if ((i+1) == storedCycle.length) {
@@ -72,13 +99,14 @@ class CycleView(val grid: GridView) extends BorderPanel {
         }
       }
     }
-
   }
 
+  /** Draws the given cycle on top of the grid in the tableau view.
+    *
+    * @param cycle The cycle to be drawn on the grid.
+    */
   def showCycle(cycle: List[Tuple2[Int, Int]]): Unit = {
     storedCycle = cycle
-    println("Stored cycle")
-    //grid.visible = false
     paintCycle = true
     repaint()
   }

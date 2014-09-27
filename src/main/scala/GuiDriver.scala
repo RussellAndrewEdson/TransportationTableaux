@@ -27,8 +27,15 @@ import event._
 
 import java.awt.Color
 
-/** 2B documented.
+/** The GUI version of the TransportationTableaux program. The user can enter
+  * the problem specification (supplies, demands, link-flow costs) at the 
+  * interactive tableau, and then can click through the complete solution of
+  * the Transportation problem -- every tableau, cycle and star-pair will be
+  * shown. Alternatively, the user can simply solve the problem immediately.
+  * The basic solution and cost are also shown for each new allocation.
   *
+  * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
+  * @version 1.0
   */
 object GuiDriver extends SimpleSwingApplication {
   
@@ -194,8 +201,11 @@ object GuiDriver extends SimpleSwingApplication {
     listenTo(stepButton)
     listenTo(solveButton)
 
-    //TODO Document all of this stuff!
+    /* The reactions for the button clicks control the main program flow. */
     reactions += {
+      /* When the 'Resize' button is clicked, we refresh the tableau view
+       * with a new tableau of the given size.
+       */
       case ButtonClicked(component) if component == resizeButton =>
         tableauDisplay = new TableauView(
             suppliesField.text.toInt,
@@ -223,7 +233,13 @@ object GuiDriver extends SimpleSwingApplication {
 
         repaint()
 
+      /* When the 'Step' button is clicked, We work through the complete
+       * solution to the problem in the tableau.
+       */
       case ButtonClicked(component) if component == stepButton =>
+        /* If we have a new problem, we instantiate the tableau and
+         * perform the North-West corner rule.
+         */
         if (!tableauCreated) {
           tableau = makeTransportationTableau()
           tableauCreated = true
@@ -234,16 +250,28 @@ object GuiDriver extends SimpleSwingApplication {
           updateSolution()
           statusDisplay.text = TableauStatus.NorthWestCorner.toString
         }
+
+        /* If we haven't yet found the star pair, we find it.
+         */
         else if (!starPairFound) {
           tableauDisplay.setStarPair(tableau.starPair)
           starPairFound = true
           statusDisplay.text = TableauStatus.FoundStarPair.toString
         }
+
+        /* If the star pair has been found, we use it to construct the
+         * cycle and display it on the screen.
+         */
         else if (!cycleConstructed) {
           tableauDisplay.setCycle(tableau.cycleTraversal(tableau.starPair))
           cycleConstructed = true
           statusDisplay.text = TableauStatus.ConstructedCycle.toString
         }
+
+        /* If the cycle has been shown, we then adjust the allocations
+         * to get to the next tableau. We then repeat the process by
+         * finding a new star pair.
+         */
         else {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
           statusDisplay.text = TableauStatus.AdjustedAllocations.toString
@@ -255,6 +283,9 @@ object GuiDriver extends SimpleSwingApplication {
           cycleConstructed = false
         }
 
+        /* If at any point the tableau is optimal, we stop and display
+         * the optimal solution to the user.
+         */
         if (tableau.isOptimal) {
           updateSolution()
           stepButton.enabled = false
@@ -268,6 +299,10 @@ object GuiDriver extends SimpleSwingApplication {
 
         repaint()
 
+      /* If the 'Solve' button is clicked at any point, we simply solve
+       * the Transportation problem to completion in a single step (ie.
+       * without showing any intermediate results.)
+       */
       case ButtonClicked(component) if component == solveButton =>
         if (!tableauCreated) {
           tableau = makeTransportationTableau()
@@ -291,7 +326,7 @@ object GuiDriver extends SimpleSwingApplication {
 
         repaint()
     }
-
   }
+
 }
 
