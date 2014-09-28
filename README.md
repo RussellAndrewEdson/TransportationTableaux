@@ -4,6 +4,14 @@ TransportationTableaux
 Solves a given Transportation Problem in Operations Research step-by-step!  
 Designed for teaching/demonstration purposes.
 
-![The GUI for the program.](https://raw.githubusercontent.com/RussellAndrewEdson/TransportationTableaux/master/gui_screenshot.png "Solving a transportation problem with the GUI")
+![The GUI for the program.](https://raw.githubusercontent.com/RussellAndrewEdson/TransportationTableaux/master/transportationtableaux_v3screenshot.png "Solving a transportation problem with the GUI")
 
-The hardest part of the GUI (the grid and cycle) have been completed as of 25/09/2014. All that is left to do is refactor some of the classes and finish all documentation (including hopefully a brief tutorial-style user guide) and modify the GUI so that it views the basic solution and cost at all times. But other than that, the program is nearly complete, and is already completely functional.
+The program has finally been released!
+
+At this point, the program is completely functional.
+A tutorial on how to use the program to solve a Transportation problem can be found in the User Guide.
+
+For ease of use, an executable .jar file has been assembled that can be run in any Java Runtime Environment.
+(All the Scala core libraries are bundled in as well -- convenient, though it does make the file quite hefty at 7.56MB.)
+
+Those that would like to play around with the source code are encouraged to use the Scala Build Tool (http://www.scala-sbt.org/), which easily retrieves all of the necessary Scala libraries and allows for the interfaces and tests to be run straight from the command line.
