@@ -1606,7 +1606,7 @@ class TransportationTableauSpec extends FlatSpec {
         example9.step2.cycleTraversal(example9.step2.starPair))
   }
 
-
+  //TODO: Finish the example.
 
 }
 
