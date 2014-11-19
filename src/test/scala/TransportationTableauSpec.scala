@@ -1606,7 +1606,73 @@ class TransportationTableauSpec extends FlatSpec {
         example9.step2.cycleTraversal(example9.step2.starPair))
   }
 
-  //TODO: Finish the example.
+  "After the 2nd adjustment, the Example 9 tableau" should
+      "then have the allocations ((5,0,10,0),(13,0,0,4),(0,15,0,3))" in {
+    assert(example9.step3.allocations.deep ==
+        Array(Array(5,0,10,0), Array(13,0,0,4), Array(0,15,0,3)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,2),(1,0),(1,3),(2,1),(2,3)" in {
+    assert(example9.step3.basicSolution.toSet ==
+        Set((0,0), (0,2), (1,0), (1,3), (2,1), (2,3)) )
+  }
+
+  it should "have a cost of 142" in {
+    assert(example9.step3.cost == 142)  
+  }
+
+  it should "have ui = (0, 2, 5)" in {
+    assert(example9.step3.ui.deep == Array(0, 2, 5).deep)
+  }
+
+  it should "have vj = (1, -2, 3, 0)" in {
+    assert(example9.step3.vj.deep == Array(1, -2, 3, 0).deep)
+  }
+
+  it should "not be optimal yet" in {
+    assert(example9.step3.isOptimal == false)
+  }
+
+  it should "have its star pair as (2,2)" in {
+    assert(example9.step3.starPair == (2,2))
+  }
+
+  it should "have the cycle (2,2)->(2,3)->(1,3)->(1,0)->(0,0)->(0,2)" in {
+    assert(example9.step3.cycleTraversal(example9.step3.starPair) ==
+        List((2,2), (2,3), (1,3), (1,0), (0,0), (0,2)) )
+  }
+
+  it should "adjust the allocations along the cycle without error" in {
+    example9.step3.adjustAllocations(
+        example9.step3.cycleTraversal(example9.step3.starPair))
+  }
+
+  "After the 3rd adjustment, the Example 9 Tableau" should
+      "then have the allocations ((8,0,7,0),(10,0,0,7),(0,15,3,0))" in {
+    assert(example9.step4.allocations.deep ==
+        Array(Array(8,0,7,0), Array(10,0,0,7), Array(0,15,3,0)).deep)
+  }
+
+  it should "have the basic solution (0,0),(0,2),(1,0),(1,3),(2,1),(2,2)" in {
+    assert(example9.step4.basicSolution.toSet ==
+        Set((0,0), (0,2), (1,0), (1,3), (2,1), (2,2)) )
+  }
+
+  it should "have a cost of 139" in {
+    assert(example9.step4.cost == 139)
+  }
+
+  it should "have ui = (0, 2, 4)" in {
+    assert(example9.step4.ui.deep == Array(0, 2, 4).deep)
+  }
+
+  it should "have vj = (1, -1, 3, 0)" in {
+    assert(example9.step4.vj.deep == Array(1, -1, 3, 0).deep)
+  }
+
+  it should "be optimal." in {
+    assert(example9.step4.isOptimal == true)
+  }
 
 }
 
