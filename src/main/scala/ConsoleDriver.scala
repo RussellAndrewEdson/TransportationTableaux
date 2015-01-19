@@ -109,7 +109,7 @@ object ConsoleDriver extends App {
   
   /* Obtain the supplies vector. */
   print("Enter the " + suppliesNum.toString + " supplies: ")
-  val supplies = new Array[Int](suppliesNum)
+  var supplies = new Array[Int](suppliesNum)
   for (i <- (0 until supplies.length)) {
     supplies(i) = input.nextInt
   }
@@ -122,7 +122,7 @@ object ConsoleDriver extends App {
 
   /* Obtain the demands vector. */
   print("Enter the " + demandsNum.toString + " demands: ")
-  val demands = new Array[Int](demandsNum)
+  var demands = new Array[Int](demandsNum)
   for (j <- (0 until demands.length)) {
     demands(j) = input.nextInt
   }
@@ -130,7 +130,7 @@ object ConsoleDriver extends App {
 
   /* Prompt for the link flow cost matrix. */
   print("Enter the link-flow costs: ")
-  val costs = Array.ofDim[Int](suppliesNum, demandsNum)
+  var costs = Array.ofDim[Int](suppliesNum, demandsNum)
   for (i <- (0 until costs.length); j <- (0 until costs(i).length)) {
     costs(i)(j) = input.nextInt
   }
@@ -139,8 +139,32 @@ object ConsoleDriver extends App {
   /* We balance the Transportation Problem if necessary by adding a 
    * fictitious supply or demand.
    */
-  //TODO: balance everything.
+  val balance = supplies.foldLeft(0)(_ + _) - demands.foldLeft(0)(_ + _)
 
+  if (balance != 0) {
+    println("The given Transportation Problem is unbalanced.")
+
+    if (balance < 0) {
+      println("Adding fictitious supplier to balance...")
+      supplies :+= -1*balance
+
+      /* We add a row of 0s to the link-flow for the supply. */
+      costs :+= Array.fill[Int](demands.length)(0)
+
+    }
+    else {
+      println("Adding fictitious demand to balance...")
+      demands :+= balance
+
+      /* We add a column of 0s to the link-flow for the demand. */
+      for (i <- 0 until supplies.length) {
+        costs(i) :+= 0
+      }
+    }
+
+    /* Print a blank line to better separate the output a bit. */
+    println()
+  }
 
   /* Instantiate the TransportationTableau class used to solve the problem,
    * and perform the North-west corner rule to start with.
