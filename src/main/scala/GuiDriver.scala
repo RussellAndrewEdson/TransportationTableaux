@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import swing.{ BorderPanel, BoxPanel, Button, FlowPanel, Label }
+import swing.{ BorderPanel, BoxPanel, Button, FlowPanel, Label, Dialog }
 import swing.{ MainFrame, Orientation, SimpleSwingApplication, TextField }
 import swing.Swing.{ LineBorder, TitledBorder }
 import swing.event.{ ButtonClicked }
@@ -36,12 +36,12 @@ import java.awt.Color
   * The basic solution and cost are also shown for each new allocation.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.3
+  * @version 0.4
   */
 object GuiDriver extends SimpleSwingApplication {
   
   /** The title of the application, including version number. */
-  val ApplicationTitle = "TransportationTableaux v0.3"
+  val ApplicationTitle = "TransportationTableaux v0.4"
 
   /** The statuses for the tableau during application execution. */
   object TableauStatus extends Enumeration {
@@ -52,6 +52,8 @@ object GuiDriver extends SimpleSwingApplication {
     val ConstructedCycle    = Value(" Constructed cycle with star pair.      ")
     val AdjustedAllocations = Value(" Adjusted allocations along the cycle.  ")
     val OptimalSolution     = Value(" Optimal solution reached.              ")
+    val UnbalancedProblem   = Value(" Problem is unbalanced; can't solve.    ")
+    val DoneBalancing       = Value(" Problem is now balanced.               ")
   }
 
   /** The text to denote that no basic solution currently exists. */
@@ -197,51 +199,169 @@ object GuiDriver extends SimpleSwingApplication {
       basicSolutionDisplay.text = "<html>" + solutionString + "</html>"
     }
 
-    /* Finally, we set up the button listening/reacting actions. */
-    listenTo(resizeButton)
-    listenTo(stepButton)
-    listenTo(solveButton)
+    /* A function to return the difference between the total supplies
+     * and the total demand (for balancing the problem.)
+     * 
+     * Returns (total supply - total demand).
+     */
+    private def supplyDemandBalance(): Int = {
+      val totalSupply = tableauDisplay.getSupplies().foldLeft(0)(_ + _)
+      val totalDemand = tableauDisplay.getDemands().foldLeft(0)(_ + _)
 
-    /* The reactions for the button clicks control the main program flow. */
-    reactions += {
-      /* When the 'Resize' button is clicked, we refresh the tableau view
-       * with a new tableau of the given size.
-       */
-      case ButtonClicked(component) if component == resizeButton =>
-        tableauDisplay = new TableauView(
-            suppliesField.text.toInt,
-            demandsField.text.toInt)
+      totalSupply - totalDemand
+    }
 
-        //TODO We apparently need to recreate the layout to get it to view
-        // properly -- check if there is a better way to do this.
-        contents = new BorderPanel() {
-          layout += specificationPanel -> BorderPanel.Position.North
-          layout += tableauDisplay -> BorderPanel.Position.Center
-          layout += new BoxPanel(Orientation.Vertical) {
-            contents += informationPanel
-            contents += controlPanel
-          } -> BorderPanel.Position.South
+    /* After the user enters the problem into the tableau view, we
+     * check whether it is balanced.
+     * 
+     *  (The function returns true if the problem is balanced, and
+     *  false if it isn't balanced.)
+     */
+    private def balancedProblem(): Boolean = 
+      supplyDemandBalance() == 0
+
+    /* If we don't have a balanced problem, we let the user know with
+     * a popup box, and ask whether they want to balance the problem
+     * automatically. If they do, we should balance it; if they don't,
+     * we don't continue any further with the solution process.
+     * 
+     * (This function returns true if the user has opted for the
+     * automatic balance, and false if they decided not.)
+     */
+    private def confirmAutoBalancing(): Boolean = {
+      var balanceMessage = "The given problem is unbalanced!\n"
+      balanceMessage += "Would you like to balance it by "
+
+      if (supplyDemandBalance() < 0) {
+        balanceMessage += "adding a fictitious supplier?"
+      }
+      else {
+        balanceMessage += "adding a fictitious demand?"
+      }
+
+      val dialogResult = Dialog.showConfirmation(
+        parent = contents.head,
+        message = balanceMessage,
+        optionType = Dialog.Options.YesNo,
+        title = "Unbalanced Problem"
+      )
+
+      dialogResult == Dialog.Result.Ok
+    }
+
+    /* If the user has opted to auto-balance the problem, we do it
+     * as follows.
+     */
+    private def autoBalanceProblem(): Unit = {
+      val balance = supplyDemandBalance()
+
+      /* We update the current tableau values. */
+      var newSuppliesNum = suppliesField.text.toInt
+      var newDemandsNum = demandsField.text.toInt
+
+      var newSupplies = tableauDisplay.getSupplies()
+      var newDemands = tableauDisplay.getDemands()
+      var newCosts = tableauDisplay.getLinkFlowCosts()
+
+      if (balance < 0) {
+        /* We add a fictitious supplier here. */
+        newSuppliesNum += 1
+        suppliesField.text = newSuppliesNum.toString
+        newSupplies :+= -1*balance
+
+        /* We add a row of 0s to the link-flow for the supply. */
+        newCosts :+= Array.fill[Int](newDemandsNum)(0)
+
+      }
+      else {
+        /* We add a fictitious demand here. */
+        newDemandsNum += 1
+        demandsField.text = newDemandsNum.toString
+        newDemands :+= balance
+
+        /* We add a column of 0s to the link-flow for the demand. */
+        for (i <- 0 until newSuppliesNum) {
+          newCosts(i) :+= 0
         }
+      }
 
-        statusDisplay.text = TableauStatus.Initial.toString
-        costDisplay.text = DefaultCost.toString
-        basicSolutionDisplay.text = NoBasicSolution
-        stepButton.enabled = true
-        solveButton.enabled = true
-        tableauCreated = false
-        starPairFound = false
-        cycleConstructed = false
+      /* Then we update the tableau view. */
+      tableauDisplay = new TableauView(
+        suppliesField.text.toInt,
+        demandsField.text.toInt)
 
-        repaint()
+      tableauDisplay.setDemands(newDemands)
+      tableauDisplay.setSupplies(newSupplies)
+      tableauDisplay.setLinkFlowCosts(newCosts)
 
-      /* When the 'Step' button is clicked, We work through the complete
-       * solution to the problem in the tableau.
+      //TODO We apparently need to recreate the layout to get it to view
+      // properly -- check if there is a better way to do this.
+      contents = new BorderPanel() {
+        layout += specificationPanel -> BorderPanel.Position.North
+        layout += tableauDisplay -> BorderPanel.Position.Center
+        layout += new BoxPanel(Orientation.Vertical) {
+          contents += informationPanel
+          contents += controlPanel
+        } -> BorderPanel.Position.South
+      }
+
+      costDisplay.text = DefaultCost.toString
+      basicSolutionDisplay.text = NoBasicSolution
+    }
+
+    /* When the 'Resize' button is clicked, we refresh the tableau view
+     *  with a new tableau of the given size.
+     */
+    private def resizeButtonClicked(): Unit = {
+      tableauDisplay = new TableauView(
+        suppliesField.text.toInt,
+        demandsField.text.toInt)
+
+      //TODO We apparently need to recreate the layout to get it to view
+      // properly -- check if there is a better way to do this.
+      contents = new BorderPanel() {
+        layout += specificationPanel -> BorderPanel.Position.North
+        layout += tableauDisplay -> BorderPanel.Position.Center
+        layout += new BoxPanel(Orientation.Vertical) {
+          contents += informationPanel
+          contents += controlPanel
+        } -> BorderPanel.Position.South
+      }
+
+      statusDisplay.text = TableauStatus.Initial.toString
+      costDisplay.text = DefaultCost.toString
+      basicSolutionDisplay.text = NoBasicSolution
+      stepButton.enabled = true
+      solveButton.enabled = true
+      tableauCreated = false
+      starPairFound = false
+      cycleConstructed = false
+
+      repaint()
+    }
+
+    /* When the 'Step' button is clicked, we work through the complete
+     * solution to the problem in the tableau. 
+     */
+    private def stepButtonClicked(): Unit = {
+      /* If we have a new problem, we instantiate the tableau and
+       * perform the North-West corner rule.
        */
-      case ButtonClicked(component) if component == stepButton =>
-        /* If we have a new problem, we instantiate the tableau and
-         * perform the North-West corner rule.
-         */
-        if (!tableauCreated) {
+      if (!tableauCreated) {
+        /* Check for an unbalanced problem first! */
+        if (!balancedProblem()) {
+          if (confirmAutoBalancing()) {
+            autoBalanceProblem()
+            statusDisplay.text = TableauStatus.DoneBalancing.toString
+          }
+          else {
+            statusDisplay.text = TableauStatus.UnbalancedProblem.toString
+          }
+
+          /* We don't do anything more in the case of an inbalance. */
+          return
+        }
+        else {
           tableau = makeTransportationTableau()
           tableauCreated = true
           starPairFound = false
@@ -251,71 +371,88 @@ object GuiDriver extends SimpleSwingApplication {
           updateSolution()
           statusDisplay.text = TableauStatus.NorthWestCorner.toString
         }
+      }
 
-        /* If we haven't yet found the star pair, we find it.
-         */
-        else if (!starPairFound) {
-          tableauDisplay.setStarPair(tableau.starPair)
-          starPairFound = true
-          statusDisplay.text = TableauStatus.FoundStarPair.toString
-        }
-
-        /* If the star pair has been found, we use it to construct the
-         * cycle and display it on the screen.
-         */
-        else if (!cycleConstructed) {
-          tableauDisplay.setCycle(tableau.cycleTraversal(tableau.starPair))
-          cycleConstructed = true
-          statusDisplay.text = TableauStatus.ConstructedCycle.toString
-        }
-
-        /* If the cycle has been shown, we then adjust the allocations
-         * to get to the next tableau. We then repeat the process by
-         * finding a new star pair.
-         */
-        else {
-          tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
-          statusDisplay.text = TableauStatus.AdjustedAllocations.toString
-
-          updateSolution()
-          tableauDisplay.clearStarPair()
-          tableauDisplay.clearCycle()
-          starPairFound = false
-          cycleConstructed = false
-        }
-
-        /* If at any point the tableau is optimal, we stop and display
-         * the optimal solution to the user.
-         */
-        if (tableau.isOptimal) {
-          updateSolution()
-          stepButton.enabled = false
-          solveButton.enabled = false
-          statusDisplay.text = TableauStatus.OptimalSolution.toString
-          tableauDisplay.clearStarPair()
-          tableauDisplay.clearCycle()
-          starPairFound = false
-          cycleConstructed = false
-        }
-
-        repaint()
-
-      /* If the 'Solve' button is clicked at any point, we simply solve
-       * the Transportation problem to completion in a single step (ie.
-       * without showing any intermediate results.)
+      /* If we haven't yet found the star pair, we find it.
        */
-      case ButtonClicked(component) if component == solveButton =>
-        if (!tableauCreated) {
+      else if (!starPairFound) {
+        tableauDisplay.setStarPair(tableau.starPair)
+        starPairFound = true
+        statusDisplay.text = TableauStatus.FoundStarPair.toString
+      }
+
+      /* If the star pair has been found, we use it to construct the
+       * cycle and display it on the screen.
+       */
+      else if (!cycleConstructed) {
+        tableauDisplay.setCycle(tableau.cycleTraversal(tableau.starPair))
+        cycleConstructed = true
+        statusDisplay.text = TableauStatus.ConstructedCycle.toString
+      }
+
+      /* If the cycle has been shown, we then adjust the allocations
+       * to get to the next tableau. We then repeat the process by
+       * finding a new star pair.
+       */
+      else {
+        tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
+        statusDisplay.text = TableauStatus.AdjustedAllocations.toString
+
+        updateSolution()
+        tableauDisplay.clearStarPair()
+        tableauDisplay.clearCycle()
+        starPairFound = false
+        cycleConstructed = false
+      }
+
+      /* If at any point the tableau is optimal, we stop and display
+       * the optimal solution to the user.
+       */
+      if (tableau.isOptimal) {
+        updateSolution()
+        stepButton.enabled = false
+        solveButton.enabled = false
+        statusDisplay.text = TableauStatus.OptimalSolution.toString
+        tableauDisplay.clearStarPair()
+        tableauDisplay.clearCycle()
+        starPairFound = false
+        cycleConstructed = false
+      }
+
+      repaint()
+    }
+
+    /* If the 'Solve' button is clicked at any point, we simply solve
+     * the Transportation problem to completion in a single step 
+     * (ie. without showing any intermediate results.)
+     */
+    private def solveButtonClicked(): Unit = {
+      if (!tableauCreated) {
+        /* Check for an unbalanced problem first! */
+        if (!balancedProblem()) {
+          if (confirmAutoBalancing()) {
+            autoBalanceProblem()
+            statusDisplay.text = TableauStatus.DoneBalancing.toString
+          }
+          else {
+            statusDisplay.text = TableauStatus.UnbalancedProblem.toString
+          }
+
+          /* We don't do anything more in the case of an inbalance. */
+          return
+        }
+
+        else {
           tableau = makeTransportationTableau()
           tableauCreated = true
-          
+
           tableau.northWestCornerRule()
         }
 
         while (!tableau.isOptimal) {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
         }
-        
+
         updateSolution()
         stepButton.enabled = false
         solveButton.enabled = false
@@ -326,6 +463,25 @@ object GuiDriver extends SimpleSwingApplication {
         cycleConstructed = false
 
         repaint()
+      }
+    }
+
+    /* Finally, we set up the buttons. The reactions for the button 
+     * clicks control the main program flow.
+     */
+    listenTo(resizeButton)
+    listenTo(stepButton)
+    listenTo(solveButton)
+
+    reactions += {
+      case ButtonClicked(component) if component == resizeButton =>
+        resizeButtonClicked()
+
+      case ButtonClicked(component) if component == stepButton =>
+        stepButtonClicked()
+
+      case ButtonClicked(component) if component == solveButton =>
+        solveButtonClicked()
     }
   }
 

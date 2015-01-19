@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -33,7 +33,7 @@ import java.awt.Color
   * @constructor Create a new editable cell with a default value (0).
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.2
+  * @version 0.3
   */
 class EditableCell extends BorderPanel {
 
@@ -70,5 +70,13 @@ class EditableCell extends BorderPanel {
     * @return The integer value that is displayed by the cell.
     */
   def getValue(): Int = value.text.toInt
+
+  /** Programatically sets the current displayed value of this cell.
+    * 
+    * @param newValue The integer value to be displayed in the cell.
+    */
+  def setValue(newValue: Int): Unit = {
+    value.text = newValue.toString
+  }
 
 }

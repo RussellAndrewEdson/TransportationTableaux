@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@ import java.awt.Color
   * @param cellCount The number of cells for the list.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.2
+  * @version 0.3
   */
 class SupplyView(val cellCount: Int) 
     extends BoxPanel(Orientation.Vertical) {
@@ -67,6 +67,15 @@ class SupplyView(val cellCount: Int)
     indices.foreach { i => supplies(i) = cells(i).getValue() }
 
     supplies
+  }
+
+  /** Sets the supplies to the values in the given integer array.
+    * 
+    * @param values The new values for the supplies.
+    */
+  def setSupplies(values: Array[Int]): Unit = {
+    // Error checking?
+    indices.foreach { i => cells(i).setValue(values(i)) }
   }
 
 }

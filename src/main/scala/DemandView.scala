@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@ import java.awt.Color
   * @param cellCount The number of cells for the list.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.2
+  * @version 0.3
   */
 class DemandView(val cellCount: Int) 
     extends BoxPanel(Orientation.Horizontal) {
@@ -67,6 +67,14 @@ class DemandView(val cellCount: Int)
     indices.foreach { j => demands(j) = cells(j).getValue() }
 
     demands
+  }
+
+  /** Sets the demands to the values in the given integer array.
+    * 
+    * @param values The new values for the demand.
+    */
+  def setDemands(values: Array[Int]): Unit = {
+    indices.foreach { j => cells(j).setValue(values(j)) }
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -129,6 +129,18 @@ class GridView(val rowCount: Int, val columnCount: Int)
 
     plusPairs.foreach  { p => cells(p._1)(p._2).setCycle("+") }
     minusPairs.foreach { p => cells(p._1)(p._2).setCycle("-") }
+  }
+
+  /** Sets the link-flow costs for the grid to the values in the given
+    *  2-dimensional array.
+    * 
+    * @param costs A 2-dimensional integer array of link-flow costs.
+    */
+  def setLinkFlowCosts(costs: Array[Array[Int]]): Unit = {
+    // Error checking?
+    indices.foreach {
+      p => cells(p._1)(p._2).setCost(costs(p._1)(p._2))
+    }
   }
 
   /** Sets the given star pair in the grid (ie. labels it with a "*".)

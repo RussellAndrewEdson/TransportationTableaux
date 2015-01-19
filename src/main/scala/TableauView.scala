@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -36,7 +36,7 @@ import swing.{ BorderPanel, Dimension, Label }
   * @param demandCount The number of demands for the tableau.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.3
+  * @version 0.4
   */
 class TableauView(val supplyCount: Int, val demandCount: Int) 
     extends BorderPanel {
@@ -159,6 +159,22 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     drawnCycle.showCycle(cycle)
   }
 
+  /** Sets the demands to the values in the given integer array.
+    * 
+    * @param values The new values for the demand.
+    */
+  def setDemands(values: Array[Int]): Unit = {
+    demands.setDemands(values)
+  }
+
+  /** Sets the link-flow costs to the values in the given 2-dimensional array.
+    * 
+    * @param costs The new link-flow costs for the grid.
+    */
+  def setLinkFlowCosts(costs: Array[Array[Int]]): Unit = {
+    linkFlow.setLinkFlowCosts(costs)
+  }
+
   /** Sets the star pair as the given pair in the grid view.
     *
     * For convenience, this method takes in a tuple argument; the output of
@@ -169,6 +185,14 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     */
   def setStarPair(pair: Tuple2[Int, Int]): Unit = {
     linkFlow.setStarPair(pair)
+  }
+
+  /** Sets the supplies to the values in the given integer array.
+    * 
+    * @param values The new values for the supply.
+    */
+  def setSupplies(values: Array[Int]): Unit = {
+    supplies.setSupplies(values)
   }
 
   /** Sets the displayed ui dual variables to those in the given array.

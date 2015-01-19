@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@ import java.awt.Color
   *              link-flow cost (0).
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.3
+  * @version 0.4
   */
 class GridCell extends GridPanel(2, 2) {
 
@@ -119,6 +119,14 @@ class GridCell extends GridPanel(2, 2) {
     */
   def setAllocation(value: Int): Unit = {
     allocation.text = value.toString
+  }
+
+  /** Sets the current value for the link-flow cost assigned to this cell.
+    * 
+    * @param value The new value for the link-flow cost.
+    */
+  def setCost(value: Int): Unit = {
+    linkFlowCost.text = value.toString
   }
 
   /** Labels this cell with a "+" or "-" to denote that it is part of 
