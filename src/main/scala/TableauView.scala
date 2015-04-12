@@ -21,7 +21,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import swing.{ BorderPanel, Dimension, Label }
+import swing.{ BorderPanel, Dimension, Label, Orientation }
 
 /** The visual representation of the Transportation Tableau in the GUI.
   *
@@ -56,8 +56,8 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
   private val demands = new DemandView(demandCount)
 
   /* The ui and vj dual variables are displayed in their own lists. */
-  private val ui = new UiView(supplyCount)
-  private val vj = new VjView(demandCount)
+  private val ui = new ValueListView(supplyCount, Orientation.Vertical, "Ui")
+  private val vj = new ValueListView(demandCount, Orientation.Horizontal, "Vj")
 
   /* The link-flow allocation grid is displayed in the center. */
   private val linkFlow = new GridView(supplyCount, demandCount)
@@ -204,7 +204,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     * @param uiValues An integer array containing the new ui values.
     */
   def setUi(uiValues: Array[Int]): Unit = {
-    ui.setUi(uiValues)
+    ui.setValues(uiValues)
   }
 
   /** Sets the displayed vj dual variables to those in the given array.
@@ -216,7 +216,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     * @param vjValues An integer array containing the new vj values.
     */
   def setVj(vjValues: Array[Int]): Unit = {
-    vj.setVj(vjValues)
+    vj.setValues(vjValues)
   }
 
 }
