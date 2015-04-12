@@ -61,8 +61,8 @@ class ValueListView(
   /** Sets the displayed values to those in the given array.
     * 
     * (This method is provided for convenience: the input can simply be
-    * the output of the .ui() method of the current TransportationTableau
-    * object.)
+    * the output of the .ui() or .vj() methods of the current
+    * TransportationTableau object.)
     * 
     * @param values An array for the values to be displayed.
     */
