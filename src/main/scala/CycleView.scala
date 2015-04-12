@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Russell Andrew Edson
+ * Copyright (c) 2013-2014, 2015 Russell Andrew Edson
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@ import java.awt.{ BasicStroke, Color, geom, Graphics2D, Point }
   * @param grid The grid that this cycle will be drawn on.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.1
+  * @version 0.2
   */
 class CycleView(val grid: GridView) extends BorderPanel {
 
@@ -58,8 +58,8 @@ class CycleView(val grid: GridView) extends BorderPanel {
   private def getCellMidpoint(cell: Tuple2[Int, Int]): Point = {
     val cellSize = grid.getCellSize()
     return new Point( 
-        (cellSize.width  / 2) + (cellSize.width  * cell._2) , 
-        (cellSize.height / 2) + (cellSize.height * cell._1) )
+        (cellSize.width  / 2) + (cellSize.width  * cell._2), 
+        (cellSize.height / 2) + (cellSize.height * cell._1))
   }
 
   /** Hides the cycle from view if it has been drawn.
@@ -82,20 +82,19 @@ class CycleView(val grid: GridView) extends BorderPanel {
 
     /* We draw the cycle to the screen here if it is to be shown. */
     if (paintCycle == true) {
-      for(i <- 0 until storedCycle.length) {
+      for (i <- 0 until storedCycle.length) {
+        g.setColor(Color.BLUE)
+        g.setStroke(new BasicStroke(2))
+
         if ((i+1) == storedCycle.length) {
-          val cellA = getCellMidpoint( storedCycle(i) )
-          val cellB = getCellMidpoint( storedCycle(0) )
-          g.setColor(Color.BLUE)
-          g.setStroke(new BasicStroke(2))
-          g.drawLine( cellA.x, cellA.y, cellB.x, cellB.y )
+          val cellA = getCellMidpoint(storedCycle(i))
+          val cellB = getCellMidpoint(storedCycle(0))
+          g.drawLine(cellA.x, cellA.y, cellB.x, cellB.y)        
         }
         else {
-          val cellA = getCellMidpoint( storedCycle(i) )
-          val cellB = getCellMidpoint( storedCycle(i+1) )
-          g.setColor(Color.BLUE)
-          g.setStroke(new BasicStroke(2))
-          g.drawLine( cellA.x, cellA.y, cellB.x, cellB.y )
+          val cellA = getCellMidpoint(storedCycle(i))
+          val cellB = getCellMidpoint(storedCycle(i+1))
+          g.drawLine(cellA.x, cellA.y, cellB.x, cellB.y)
         }
       }
     }
