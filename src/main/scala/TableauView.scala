@@ -38,7 +38,7 @@ import swing.{ BorderPanel, Dimension, Label, Orientation }
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
   * @version 0.4
   */
-class TableauView(val supplyCount: Int, val demandCount: Int) 
+class TableauView(val supplyCount: Int, val demandCount: Int)
     extends BorderPanel {
 
   /* We define a spacer so that we can align the demands list and the
@@ -52,8 +52,10 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
   }
 
   /* The supplies and demands are displayed in their own lists. */
-  private val supplies = new SupplyView(supplyCount)
-  private val demands = new DemandView(demandCount)
+  private val supplies =
+      new EditableListView(supplyCount, Orientation.Vertical, "Supply")
+  private val demands =
+      new EditableListView(demandCount, Orientation.Horizontal, "Demand")
 
   /* The ui and vj dual variables are displayed in their own lists. */
   private val ui = new ValueListView(supplyCount, Orientation.Vertical, "Ui")
@@ -114,7 +116,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     *
     * @return An integer array containing the demand values.
     */
-  def getDemands(): Array[Int] = demands.getDemands()
+  def getDemands(): Array[Int] = demands.getValues()
 
   /** Returns a 2-dimensional array containing the link-flow costs.
     *
@@ -132,7 +134,7 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     *
     * @return An integer array containing the supply values.
     */
-  def getSupplies(): Array[Int] = supplies.getSupplies()
+  def getSupplies(): Array[Int] = supplies.getValues()
 
   /** Sets the displayed allocation values to those in the given array.
     *
@@ -161,10 +163,10 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
 
   /** Sets the demands to the values in the given integer array.
     * 
-    * @param values The new values for the demand.
+    * @param values An integer array with he new values for the demand.
     */
   def setDemands(values: Array[Int]): Unit = {
-    demands.setDemands(values)
+    demands.setValues(values)
   }
 
   /** Sets the link-flow costs to the values in the given 2-dimensional array.
@@ -189,10 +191,10 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
 
   /** Sets the supplies to the values in the given integer array.
     * 
-    * @param values The new values for the supply.
+    * @param values An integer array with the new values for the supply.
     */
   def setSupplies(values: Array[Int]): Unit = {
-    supplies.setSupplies(values)
+    supplies.setValues(values)
   }
 
   /** Sets the displayed ui dual variables to those in the given array.
@@ -201,10 +203,10 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     * TransportationTableau instance can be sent to this method at any stage
     * and have its current values displayed.)
     *
-    * @param uiValues An integer array containing the new ui values.
+    * @param values An integer array containing the new ui values.
     */
-  def setUi(uiValues: Array[Int]): Unit = {
-    ui.setValues(uiValues)
+  def setUi(values: Array[Int]): Unit = {
+    ui.setValues(values)
   }
 
   /** Sets the displayed vj dual variables to those in the given array.
@@ -213,10 +215,10 @@ class TableauView(val supplyCount: Int, val demandCount: Int)
     * TransportationTableau instance can be sent to this method at any stage
     * and have its current values displayed.)
     *
-    * @param vjValues An integer array containing the new vj values.
+    * @param values An integer array containing the new vj values.
     */
-  def setVj(vjValues: Array[Int]): Unit = {
-    vj.setValues(vjValues)
+  def setVj(values: Array[Int]): Unit = {
+    vj.setValues(values)
   }
 
 }
