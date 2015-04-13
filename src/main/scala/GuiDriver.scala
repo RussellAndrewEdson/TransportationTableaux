@@ -44,17 +44,17 @@ object GuiDriver extends SimpleSwingApplication {
   val ApplicationTitle = "TransportationTableaux v0.4"
 
   /** The statuses for the tableau during application execution. */
-  object TableauStatus extends Enumeration {
-    type TableauStatus = Value
-    val Initial             = Value(" Enter the supplies, demands and costs. ")
-    val NorthWestCorner     = Value(" Finished North-West Corner Rule.       ")
-    val FoundStarPair       = Value(" Located star (*) pair (ui+vj >= cij).  ")
-    val ConstructedCycle    = Value(" Constructed cycle with star pair.      ")
-    val AdjustedAllocations = Value(" Adjusted allocations along the cycle.  ")
-    val OptimalSolution     = Value(" Optimal solution reached.              ")
-    val UnbalancedProblem   = Value(" Problem is unbalanced; can't solve.    ")
-    val DoneBalancing       = Value(" Problem is now balanced.               ")
-  }
+  //object TableauStatus extends Enumeration {
+  //  type TableauStatus = Value
+  //  val Initial             = Value(" Enter the supplies, demands and costs. ")
+  //  val NorthWestCorner     = Value(" Finished North-West Corner Rule.       ")
+  //  val FoundStarPair       = Value(" Located star (*) pair (ui+vj >= cij).  ")
+  //  val ConstructedCycle    = Value(" Constructed cycle with star pair.      ")
+  //  val AdjustedAllocations = Value(" Adjusted allocations along the cycle.  ")
+  //  val OptimalSolution     = Value(" Optimal solution reached.              ")
+  //  val UnbalancedProblem   = Value(" Problem is unbalanced; can't solve.    ")
+  //  val DoneBalancing       = Value(" Problem is now balanced.               ")
+  //}
 
   /** The text to denote that no basic solution currently exists. */
   val NoBasicSolution = "No allocations yet."
@@ -118,13 +118,13 @@ object GuiDriver extends SimpleSwingApplication {
      * together immediately beneath the tableau itself.
      */
     val informationPanel = new BoxPanel(Orientation.Vertical) {
-      contents += new FlowPanel(FlowPanel.Alignment.Left) (
-          new Label("Cost: "),
-          costDisplay)
-      contents += new FlowPanel(FlowPanel.Alignment.Left) (
-          new Label("Basic Solution: "))
-      contents += new FlowPanel(FlowPanel.Alignment.Center) (
-          basicSolutionDisplay)
+    //  contents += new FlowPanel(FlowPanel.Alignment.Left) (
+    //      new Label("Cost: "),
+    //      costDisplay)
+    //  contents += new FlowPanel(FlowPanel.Alignment.Left) (
+    //      new Label("Basic Solution: "))
+    //  contents += new FlowPanel(FlowPanel.Alignment.Center) (
+    //      basicSolutionDisplay)
     }
 
     /* We layout the tableau control mechanisms (stepping, solving, and the
@@ -133,7 +133,7 @@ object GuiDriver extends SimpleSwingApplication {
     val controlPanel = new BorderPanel() {
       border = LineBorder(Color.BLACK)
 
-      layout += statusDisplay -> BorderPanel.Position.West
+    //  layout += statusDisplay -> BorderPanel.Position.West
       layout += new Label("       ") -> BorderPanel.Position.Center  // spacer
       layout += new BoxPanel(Orientation.Horizontal) {
           contents += stepButton
@@ -143,12 +143,16 @@ object GuiDriver extends SimpleSwingApplication {
 
     /* Finally, we align everything properly in the main layout. */
     contents = new BorderPanel() {
-      layout += specificationPanel -> BorderPanel.Position.North
-      layout += tableauDisplay -> BorderPanel.Position.Center
-      layout += new BoxPanel(Orientation.Vertical) {
+      layout += new BorderPanel() {
+        layout += specificationPanel -> BorderPanel.Position.North
+        layout += tableauDisplay -> BorderPanel.Position.Center
+        layout += new BoxPanel(Orientation.Vertical) {
           contents += informationPanel
           contents += controlPanel
         } -> BorderPanel.Position.South
+      } -> BorderPanel.Position.West
+
+      layout += new StatusView() -> BorderPanel.Position.East
     }
 
 
@@ -319,13 +323,17 @@ object GuiDriver extends SimpleSwingApplication {
 
       //TODO We apparently need to recreate the layout to get it to view
       // properly -- check if there is a better way to do this.
-      contents = new BorderPanel() {
-        layout += specificationPanel -> BorderPanel.Position.North
-        layout += tableauDisplay -> BorderPanel.Position.Center
-        layout += new BoxPanel(Orientation.Vertical) {
-          contents += informationPanel
-          contents += controlPanel
-        } -> BorderPanel.Position.South
+      contents = new BoxPanel(Orientation.Horizontal) {
+        contents += new BorderPanel() {
+          layout += specificationPanel -> BorderPanel.Position.North
+          layout += tableauDisplay -> BorderPanel.Position.Center
+          layout += new BoxPanel(Orientation.Vertical) {
+            contents += informationPanel
+            contents += controlPanel
+          } -> BorderPanel.Position.South
+        }
+
+        contents += new StatusView()
       }
 
       statusDisplay.text = TableauStatus.Initial.toString
