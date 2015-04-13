@@ -36,28 +36,12 @@ import java.awt.Color
   * The basic solution and cost are also shown for each new allocation.
   *
   * @author Russell Andrew Edson, <russell.andrew.edson@gmail.com>
-  * @version 0.4
+  * @version 2.0
   */
 object GuiDriver extends SimpleSwingApplication {
   
   /** The title of the application, including version number. */
-  val ApplicationTitle = "TransportationTableaux v0.4"
-
-  /** The statuses for the tableau during application execution. */
-  //object TableauStatus extends Enumeration {
-  //  type TableauStatus = Value
-  //  val Initial             = Value(" Enter the supplies, demands and costs. ")
-  //  val NorthWestCorner     = Value(" Finished North-West Corner Rule.       ")
-  //  val FoundStarPair       = Value(" Located star (*) pair (ui+vj >= cij).  ")
-  //  val ConstructedCycle    = Value(" Constructed cycle with star pair.      ")
-  //  val AdjustedAllocations = Value(" Adjusted allocations along the cycle.  ")
-  //  val OptimalSolution     = Value(" Optimal solution reached.              ")
-  //  val UnbalancedProblem   = Value(" Problem is unbalanced; can't solve.    ")
-  //  val DoneBalancing       = Value(" Problem is now balanced.               ")
-  //}
-
-  /** The text to denote that no basic solution currently exists. */
-  val NoBasicSolution = "No allocations yet."
+  val ApplicationTitle = "TransportationTableaux v2.0"
 
   /** We default to 3 supplies when the program starts. */
   val DefaultSupplies = 3
@@ -83,14 +67,8 @@ object GuiDriver extends SimpleSwingApplication {
     /* The tableau is on display in the middle of the application. */
     var tableauDisplay = new TableauView(DefaultSupplies, DefaultDemands)
 
-    /* We show the current transport cost for the tableau at the bottom. */
-    val costDisplay = new Label(DefaultCost.toString) 
-
-    /* The basic solution is shown at the bottom of the tableau. */
-    val basicSolutionDisplay = new Label(NoBasicSolution)
-
     /* The current execution status of the program is shown at all times. */
-    val statusDisplay = new Label(TableauStatus.Initial.toString)
+    val statusDisplay = new StatusView()
 
     /* The user steps through the solution by clicking a button. */
     val stepButton = new Button("Step")
@@ -114,27 +92,12 @@ object GuiDriver extends SimpleSwingApplication {
       contents += resizeButton
     }
 
-    /* We layout the current tableau information (cost, basic solution)
-     * together immediately beneath the tableau itself.
-     */
-    val informationPanel = new BoxPanel(Orientation.Vertical) {
-    //  contents += new FlowPanel(FlowPanel.Alignment.Left) (
-    //      new Label("Cost: "),
-    //      costDisplay)
-    //  contents += new FlowPanel(FlowPanel.Alignment.Left) (
-    //      new Label("Basic Solution: "))
-    //  contents += new FlowPanel(FlowPanel.Alignment.Center) (
-    //      basicSolutionDisplay)
-    }
-
-    /* We layout the tableau control mechanisms (stepping, solving, and the
-     * status) together at the very bottom of the window.
+    /* We layout the tableau control mechanisms (stepping, solving)
+     * together at the very bottom of the window.
      */
     val controlPanel = new BorderPanel() {
       border = LineBorder(Color.BLACK)
 
-    //  layout += statusDisplay -> BorderPanel.Position.West
-      layout += new Label("       ") -> BorderPanel.Position.Center  // spacer
       layout += new BoxPanel(Orientation.Horizontal) {
           contents += stepButton
           contents += solveButton
@@ -147,12 +110,11 @@ object GuiDriver extends SimpleSwingApplication {
         layout += specificationPanel -> BorderPanel.Position.North
         layout += tableauDisplay -> BorderPanel.Position.Center
         layout += new BoxPanel(Orientation.Vertical) {
-          contents += informationPanel
           contents += controlPanel
         } -> BorderPanel.Position.South
       } -> BorderPanel.Position.West
 
-      layout += new StatusView() -> BorderPanel.Position.East
+      layout += statusDisplay -> BorderPanel.Position.East
     }
 
 
@@ -185,22 +147,12 @@ object GuiDriver extends SimpleSwingApplication {
       tableauDisplay.setVj(tableau.vj)
       tableauDisplay.setAllocations(tableau.allocations)
 
-      /* Next, we update the cost. */
-      costDisplay.text = tableau.cost.toString
-
-      /* Finally, we update the basic solution (with some HTML for nice 
-       * subscripting of the variables).
+      /* Then we update the status pane with the solution, cost and
+       * optimality.
        */
-      def formatSolution(pair: Tuple2[Int, Int]): String = 
-          ("x<sub>%d, %d</sub>".format((pair._1 + 1), (pair._2 + 1)) +
-          " = " + tableau.allocations(pair._1)(pair._2).toString)
-
-      val solutionIndices = tableau.basicSolution.sorted
-      val solutionString = solutionIndices.map {
-          p => formatSolution(p)
-      } mkString(", &nbsp;")
-
-      basicSolutionDisplay.text = "<html>" + solutionString + "</html>"
+      statusDisplay.updateSolution(tableau.basicSolution, tableau.allocations)
+      statusDisplay.updateCost(tableau.cost)
+      statusDisplay.updateOptimality(tableau.isOptimal)
     }
 
     /* A function to return the difference between the total supplies
@@ -301,16 +253,16 @@ object GuiDriver extends SimpleSwingApplication {
       //TODO We apparently need to recreate the layout to get it to view
       // properly -- check if there is a better way to do this.
       contents = new BorderPanel() {
-        layout += specificationPanel -> BorderPanel.Position.North
-        layout += tableauDisplay -> BorderPanel.Position.Center
-        layout += new BoxPanel(Orientation.Vertical) {
-          contents += informationPanel
-          contents += controlPanel
-        } -> BorderPanel.Position.South
-      }
+        layout += new BorderPanel() {
+          layout += specificationPanel -> BorderPanel.Position.North
+          layout += tableauDisplay -> BorderPanel.Position.Center
+          layout += new BoxPanel(Orientation.Vertical) {
+            contents += controlPanel
+          } -> BorderPanel.Position.South
+        } -> BorderPanel.Position.West
 
-      costDisplay.text = DefaultCost.toString
-      basicSolutionDisplay.text = NoBasicSolution
+        layout += statusDisplay -> BorderPanel.Position.East
+      }
     }
 
     /* When the 'Resize' button is clicked, we refresh the tableau view
@@ -323,22 +275,19 @@ object GuiDriver extends SimpleSwingApplication {
 
       //TODO We apparently need to recreate the layout to get it to view
       // properly -- check if there is a better way to do this.
-      contents = new BoxPanel(Orientation.Horizontal) {
-        contents += new BorderPanel() {
+      contents = new BorderPanel() {
+        layout += new BorderPanel() {
           layout += specificationPanel -> BorderPanel.Position.North
           layout += tableauDisplay -> BorderPanel.Position.Center
           layout += new BoxPanel(Orientation.Vertical) {
-            contents += informationPanel
             contents += controlPanel
           } -> BorderPanel.Position.South
-        }
+        } -> BorderPanel.Position.West
 
-        contents += new StatusView()
+        layout += statusDisplay -> BorderPanel.Position.East
       }
 
-      statusDisplay.text = TableauStatus.Initial.toString
-      costDisplay.text = DefaultCost.toString
-      basicSolutionDisplay.text = NoBasicSolution
+      //statusDisplay.text = TableauStatus.Initial.toString
       stepButton.enabled = true
       solveButton.enabled = true
       tableauCreated = false
@@ -352,6 +301,9 @@ object GuiDriver extends SimpleSwingApplication {
      * solution to the problem in the tableau. 
      */
     private def stepButtonClicked(): Unit = {
+      /* We clear the previous status. */
+      statusDisplay.clear()
+
       /* If we have a new problem, we instantiate the tableau and
        * perform the North-West corner rule.
        */
@@ -360,10 +312,10 @@ object GuiDriver extends SimpleSwingApplication {
         if (!balancedProblem()) {
           if (confirmAutoBalancing()) {
             autoBalanceProblem()
-            statusDisplay.text = TableauStatus.DoneBalancing.toString
+            statusDisplay.updateStatus(TableauStatus.DoneBalancing)
           }
           else {
-            statusDisplay.text = TableauStatus.UnbalancedProblem.toString
+            statusDisplay.updateStatus(TableauStatus.UnbalancedProblem)
           }
 
           /* We don't do anything more in the case of an inbalance. */
@@ -376,8 +328,8 @@ object GuiDriver extends SimpleSwingApplication {
           cycleConstructed = false
 
           tableau.northWestCornerRule()
+          statusDisplay.updateStatus(TableauStatus.NorthWestCorner)
           updateSolution()
-          statusDisplay.text = TableauStatus.NorthWestCorner.toString
         }
       }
 
@@ -386,7 +338,7 @@ object GuiDriver extends SimpleSwingApplication {
       else if (!starPairFound) {
         tableauDisplay.setStarPair(tableau.starPair)
         starPairFound = true
-        statusDisplay.text = TableauStatus.FoundStarPair.toString
+        statusDisplay.updateStatus(TableauStatus.FoundStarPair)
       }
 
       /* If the star pair has been found, we use it to construct the
@@ -395,7 +347,7 @@ object GuiDriver extends SimpleSwingApplication {
       else if (!cycleConstructed) {
         tableauDisplay.setCycle(tableau.cycleTraversal(tableau.starPair))
         cycleConstructed = true
-        statusDisplay.text = TableauStatus.ConstructedCycle.toString
+        statusDisplay.updateStatus(TableauStatus.ConstructedCycle)
       }
 
       /* If the cycle has been shown, we then adjust the allocations
@@ -404,7 +356,7 @@ object GuiDriver extends SimpleSwingApplication {
        */
       else {
         tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
-        statusDisplay.text = TableauStatus.AdjustedAllocations.toString
+        statusDisplay.updateStatus(TableauStatus.AdjustedAllocations)
 
         updateSolution()
         tableauDisplay.clearStarPair()
@@ -417,10 +369,11 @@ object GuiDriver extends SimpleSwingApplication {
        * the optimal solution to the user.
        */
       if (tableau.isOptimal) {
+        statusDisplay.clear()
+        statusDisplay.updateStatus(TableauStatus.OptimalSolution)
         updateSolution()
         stepButton.enabled = false
         solveButton.enabled = false
-        statusDisplay.text = TableauStatus.OptimalSolution.toString
         tableauDisplay.clearStarPair()
         tableauDisplay.clearCycle()
         starPairFound = false
@@ -435,15 +388,18 @@ object GuiDriver extends SimpleSwingApplication {
      * (ie. without showing any intermediate results.)
      */
     private def solveButtonClicked(): Unit = {
+      /* Clear the status pane first. */
+      statusDisplay.clear()
+
       if (!tableauCreated) {
         /* Check for an unbalanced problem first! */
         if (!balancedProblem()) {
           if (confirmAutoBalancing()) {
             autoBalanceProblem()
-            statusDisplay.text = TableauStatus.DoneBalancing.toString
+            statusDisplay.updateStatus(TableauStatus.DoneBalancing)
           }
           else {
-            statusDisplay.text = TableauStatus.UnbalancedProblem.toString
+            statusDisplay.updateStatus(TableauStatus.UnbalancedProblem)
           }
 
           /* We don't do anything more in the case of an inbalance. */
@@ -461,10 +417,11 @@ object GuiDriver extends SimpleSwingApplication {
           tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
         }
 
+        statusDisplay.clear()
+        statusDisplay.updateStatus(TableauStatus.OptimalSolution)
         updateSolution()
         stepButton.enabled = false
         solveButton.enabled = false
-        statusDisplay.text = TableauStatus.OptimalSolution.toString
         tableauDisplay.clearStarPair()
         tableauDisplay.clearCycle()
         starPairFound = false

@@ -26,6 +26,8 @@ import swing.Swing.{ LineBorder, TitledBorder }
 
 import java.awt.Color
 
+import TableauStatus._
+
 /** A status pane for the GUI.
   * 
   * This view is basically a text field that shows the current tableau
@@ -78,7 +80,12 @@ class StatusView extends BorderPanel {
     * it out with newlines.
     */
   private def appendText(textString: String): Unit = {
-    statusText.text += "\n" + textString
+    statusText.text += textString + "\n\n"
+  }
+
+  /** Clears the current status. */
+  def clear(): Unit = {
+    statusText.text = ""
   }
 
   /** Updates the one-liner status for the current tableau.
@@ -86,17 +93,18 @@ class StatusView extends BorderPanel {
     * @param status The TableauStatus to be used for the update.
     */
   def updateStatus(status: TableauStatus.Value): Unit = {
-    appendText("status goes here")
+    val message = status match {
+      case NorthWestCorner     => "Finished North-West Corner Rule."
+      case FoundStarPair       => "Located star (*) pair (ui+vj >= cij)."
+      case ConstructedCycle    => "Constructed cycle with star pair."
+      case AdjustedAllocations => "Adjusted allocations along the cycle."
+      case OptimalSolution     => "Optimal solution reached."
+      case UnbalancedProblem   => "Problem is unbalanced; can't solve."
+      case DoneBalancing       => "Problem is now balanced."
+      case _                   => "Unknown situation."
+    }
 
-
-    //val Initial             = Value(" Enter the supplies, demands and costs. ")
-    //val NorthWestCorner     = Value(" Finished North-West Corner Rule.       ")
-    //val FoundStarPair       = Value(" Located star (*) pair (ui+vj >= cij).  ")
-    //val ConstructedCycle    = Value(" Constructed cycle with star pair.      ")
-    //val AdjustedAllocations = Value(" Adjusted allocations along the cycle.  ")
-    //val OptimalSolution     = Value(" Optimal solution reached.              ")
-    //val UnbalancedProblem   = Value(" Problem is unbalanced; can't solve.    ")
-    //val DoneBalancing       = Value(" Problem is now balanced.               ")
+    appendText(message)
   }
 
   /** Updates the basic solution for the current tableau.
@@ -107,7 +115,15 @@ class StatusView extends BorderPanel {
   def updateSolution(
       basicPairs: List[Tuple2[Int, Int]],
       allocations: Array[Array[Int]]): Unit = {
-    appendText("solution gets listed here")
+
+    /* We write the solution as xi,j = a for each basic pair, where i and j
+     * start from index 1.
+     */
+    def formatSolution(p: Tuple2[Int, Int]): String =
+      "x" + (p._1 + 1) + "," + (p._2 + 1) + " = " + allocations(p._1)(p._2)
+
+    val solutionString = basicPairs.sorted.map(formatSolution).mkString("\n")
+    appendText(solutionString)
   }
 
   /** Updates the calculated cost for the current tableau.
@@ -115,7 +131,7 @@ class StatusView extends BorderPanel {
     * @param cost The cost for the current tableau.
     */
   def updateCost(cost: Int): Unit = {
-    appendText("cost goes here")
+    appendText("Cost: " + cost.toString)
   }
 
   /** Updates the displayed optimality state for the tableau.
@@ -123,7 +139,7 @@ class StatusView extends BorderPanel {
     * @param optimal A boolean value for the optimality of the tableau.
     */
   def updateOptimality(optimal: Boolean): Unit = {
-    appendText("Optimality goes here.")
+    appendText("Optimal: " + (if (optimal) "Yes" else "No"))
   }
 
 }
