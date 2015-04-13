@@ -16,6 +16,11 @@ For ease of use, an executable .jar file has been assembled that can be run in a
 
 Those that would like to play around with the source code are encouraged to use the Scala Build Tool (http://www.scala-sbt.org/), which easily retrieves all of the necessary Scala libraries and allows for the interfaces and tests to be run straight from the command line.
 
+13/04 Update
+------------
+
+I'm trying something new by putting a status pane on the right-hand side of the window that will display the current information about the tableau (basic solution, cost, optimality, etc), and which can also be used for a greeting message when the program starts. Since the pane will always be visible (and the same size), hopefully we'll eliminate both of the aesthetic resizing bugs (see below) since we won't have text appearing/disappearing with the status bar and the basic solution/cost display.
+
 19/01 Update
 ------------
 
