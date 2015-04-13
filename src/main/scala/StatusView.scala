@@ -44,19 +44,23 @@ class StatusView extends BorderPanel {
   private val welcomeGreeting =
     """Welcome to the TransportationTableaux program!
       |
-      |Enter the supplies for the problem in the Supply column,
-      |and the demands in the Demands column. The link-flow costs
-      |are then entered in the top-right corner of the cells in
-      |the tableau grid. (For your convenience, you can TAB across
-      |the cells left-to-right.)
+      |Enter the supplies for the problem in the Supply 
+      |column, and the demands in the Demands column. 
+      |The link-flow costs are then entered in the top-right 
+      |corner of the cells in the tableau grid. (For your 
+      |convenience, you can TAB across the cells from 
+      |left to right.)
       |
-      |If you need a different problem size (ie. more/less supplies
-      |and demands), you can resize the problem by entering the 
-      |new dimensions and clicking "Resize".
+      |If you need a different problem size (ie. more/less 
+      |supplies and demands), you can resize the problem 
+      |by entering the new dimensions and clicking "Resize".
       |
-      |Once you're done entering the values, simply hit "Solve" to
-      |solve the problem outright, or you can use the "Step" button
-      |to move through the entire solution process. Have fun!""".stripMargin
+      |Once you're done entering the values, simply hit the 
+      |"Solve" button to solve the problem outright, or 
+      |you can use the "Step" button to move through the 
+      |entire solution process. 
+      |
+      |Have fun!""".stripMargin
 
   /* We surround the pane with a border to separate it from the other
    * GUI elements on the left-hand side.
@@ -65,9 +69,9 @@ class StatusView extends BorderPanel {
 
   private val statusText = new TextArea(welcomeGreeting)
   statusText.editable = false
-  statusText.minimumSize = new Dimension(400, 300)
-  statusText.maximumSize = new Dimension(400, 300)
-  statusText.preferredSize = new Dimension(400, 300)
+  statusText.minimumSize = new Dimension(340, 300)
+  statusText.maximumSize = new Dimension(340, 300)
+  statusText.preferredSize = new Dimension(340, 300)
   layout += statusText -> BorderPanel.Position.Center
 
   /** Appends the given text to the status TextField, spacing
