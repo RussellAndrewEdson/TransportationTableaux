@@ -288,6 +288,8 @@ object GuiDriver extends SimpleSwingApplication {
       }
 
       //statusDisplay.text = TableauStatus.Initial.toString
+      statusDisplay.clear()
+
       stepButton.enabled = true
       solveButton.enabled = true
       tableauCreated = false
@@ -412,23 +414,23 @@ object GuiDriver extends SimpleSwingApplication {
 
           tableau.northWestCornerRule()
         }
-
-        while (!tableau.isOptimal) {
-          tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
-        }
-
-        statusDisplay.clear()
-        statusDisplay.updateStatus(TableauStatus.OptimalSolution)
-        updateSolution()
-        stepButton.enabled = false
-        solveButton.enabled = false
-        tableauDisplay.clearStarPair()
-        tableauDisplay.clearCycle()
-        starPairFound = false
-        cycleConstructed = false
-
-        repaint()
       }
+
+      while (!tableau.isOptimal) {
+        tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
+      }
+
+      statusDisplay.clear()
+      statusDisplay.updateStatus(TableauStatus.OptimalSolution)
+      updateSolution()
+      stepButton.enabled = false
+      solveButton.enabled = false
+      tableauDisplay.clearStarPair()
+      tableauDisplay.clearCycle()
+      starPairFound = false
+      cycleConstructed = false
+
+      repaint()
     }
 
     /* Finally, we set up the buttons. The reactions for the button 
