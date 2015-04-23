@@ -441,29 +441,29 @@ object GuiDriver extends SimpleSwingApplication {
           /* We don't do anything more in the case of an inbalance. */
           return
         }
-
-        else {
-          tableau = makeTransportationTableau()
-          tableauCreated = true
-
-          tableau.northWestCornerRule()
-        }
-
-        while (!tableau.isOptimal) {
-          tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
-        }
-
-        updateSolution()
-        stepButton.enabled = false
-        solveButton.enabled = false
-        statusDisplay.text = TableauStatus.OptimalSolution.toString
-        tableauDisplay.clearStarPair()
-        tableauDisplay.clearCycle()
-        starPairFound = false
-        cycleConstructed = false
-
-        repaint()
       }
+
+      else {
+        tableau = makeTransportationTableau()
+        tableauCreated = true
+
+        tableau.northWestCornerRule()
+      }
+
+      while (!tableau.isOptimal) {
+        tableau.adjustAllocations(tableau.cycleTraversal(tableau.starPair))
+      }
+
+      updateSolution()
+      stepButton.enabled = false
+      solveButton.enabled = false
+      statusDisplay.text = TableauStatus.OptimalSolution.toString
+      tableauDisplay.clearStarPair()
+      tableauDisplay.clearCycle()
+      starPairFound = false
+      cycleConstructed = false
+
+      repaint()
     }
 
     /* Finally, we set up the buttons. The reactions for the button 
